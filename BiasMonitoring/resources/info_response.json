@@ -1,0 +1,279 @@
+{
+  "inputSchema": {
+    "items": {
+      "customer_data_input-6": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-6",
+        "values": [
+          1,
+          0
+        ],
+        "index": 6
+      },
+      "customer_data_input-5": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-5",
+        "values": [
+          0,
+          1
+        ],
+        "index": 5
+      },
+      "customer_data_input-4": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-4",
+        "values": [
+          1,
+          0
+        ],
+        "index": 4
+      },
+      "customer_data_input-3": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-3",
+        "values": [
+          1,
+          0
+        ],
+        "index": 3
+      },
+      "customer_data_input-2": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-2",
+        "values": [
+          2,
+          1,
+          4,
+          5,
+          3
+        ],
+        "index": 2
+      },
+      "customer_data_input-1": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-1",
+        "values": [
+          135000,
+          292500,
+          180000,
+          267750,
+          216000,
+          225000,
+          234000,
+          252000,
+          270000,
+          360000,
+          450000,
+          148500,
+          157500,
+          337500,
+          166500,
+          202500,
+          211500,
+          427500,
+          229500,
+          247500,
+          67500,
+          279000,
+          297000,
+          315000,
+          90000,
+          765000,
+          405000,
+          112500,
+          126000,
+          130500
+        ],
+        "index": 1
+      },
+      "customer_data_input-0": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-0",
+        "values": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "index": 0
+      },
+      "customer_data_input-10": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-10",
+        "values": [
+          555,
+          586,
+          708,
+          769,
+          798,
+          828,
+          860,
+          889,
+          921,
+          982,
+          1134,
+          1103,
+          1194,
+          1195,
+          1163,
+          1256,
+          1286,
+          1347,
+          1408,
+          1469,
+          1560,
+          1652,
+          1620,
+          1712,
+          1773,
+          2016,
+          2077,
+          2290,
+          2289,
+          2381,
+          2443,
+          2808,
+          2747,
+          2777,
+          2901,
+          2989,
+          3174,
+          3112,
+          3173,
+          3234,
+          3720,
+          4056,
+          4025,
+          4450,
+          4391,
+          4542,
+          4727,
+          4846,
+          5364,
+          5304,
+          5792,
+          5730,
+          6276,
+          7099,
+          8684,
+          10843,
+          130,
+          252,
+          312,
+          432
+        ],
+        "index": 10
+      },
+      "customer_data_input-9": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-9",
+        "values": [
+          18325,
+          17573,
+          17641,
+          17785,
+          19575,
+          19861,
+          20991,
+          21155,
+          20531,
+          20953,
+          8861,
+          8842,
+          9430,
+          9657,
+          9957,
+          10031,
+          9927,
+          10064,
+          10450,
+          10266,
+          10321,
+          10750,
+          10669,
+          10611,
+          10264,
+          10628,
+          11042,
+          10968,
+          10997,
+          11842,
+          12005,
+          12197,
+          12411,
+          12333,
+          12628,
+          12689,
+          12859,
+          12915,
+          13271,
+          13679,
+          13642,
+          13923,
+          14122,
+          14781,
+          14730,
+          14667,
+          14450,
+          14867,
+          15321,
+          15825,
+          15519,
+          15484,
+          15737,
+          15444,
+          15761,
+          16027,
+          16212,
+          16582,
+          16872,
+          16670,
+          17016,
+          17778,
+          17726,
+          18926,
+          18674,
+          20502,
+          20874,
+          21474,
+          20604
+        ],
+        "index": 9
+      },
+      "customer_data_input-8": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-8",
+        "values": [
+          0,
+          1
+        ],
+        "index": 8
+      },
+      "customer_data_input-7": {
+        "type": "DOUBLE",
+        "name": "customer_data_input-7",
+        "values": [
+          1
+        ],
+        "index": 7
+      }
+    },
+    "nameMapping": {}
+  },
+  "outputSchema": {
+    "items": {
+      "predict": {
+        "type": "INT64",
+        "name": "predict",
+        "values": [
+          0,
+          1
+        ],
+        "index": 11
+      }
+    },
+    "nameMapping": {}
+  },
+  "observations": 2250,
+  "modelId": "demo-loan-nn-onnx-beta"
+}
