@@ -1,5 +1,10 @@
 # Bias Monitoring via TrustyAI in ODH
-This demo will explore using TrustyAI to monitor models for bias. 
+Ensuring that your models are fair and unbiased is a crucial part of establishing trust in your models amonst
+your users. While fairness can be explored during model training, it is only during deployment 
+that your models have exposure to the outside world. It does not matter if your models are unbiased on the training data, if they are dangerously biased over real-world data, and therefore it is absolutely 
+crucial to monitor your models for fairness during real-world deployments: 
+
+This demo will explore how to use TrustyAI to monitor models for bias, and how not all model biases are visible at training time.   
 
 ## Context
 We will take on the 
