@@ -2,8 +2,8 @@
 This repo contains a variety of demos showcasing TrustyAI's capabilities within Open Data Hub.
 
 ## Contents
-1) [Installing OpenDataHub and TrustyAI](Installation/Installation.md): How to install Open Data Hub and TrustyAI on your cluster.
-2) [Bias Monitoring](BiasMonitoring/GenderBiasMonitoring.md): How to use TrustyAI to examine your deployed models for unfair biases.
+1) [Installing OpenDataHub and TrustyAI](1-Installation/README.md): How to install Open Data Hub and TrustyAI on your cluster.
+2) [Bias Monitoring](2-BiasMonitoring/README.md): How to use TrustyAI to examine your deployed models for unfair biases.
 
 ## Demos Coming Soon
 3) Data Drift [Coming Soon]: How to detect if the production data your models are receiving matches the data they were trained on.

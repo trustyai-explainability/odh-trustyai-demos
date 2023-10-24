@@ -27,7 +27,7 @@ indicating that the two groups' rates of getting good outcomes only varies by +/
 
 
 ## Setup
-Follow the instructions within the [Installation section](../Installation/Installation.md). Afterwards,
+Follow the instructions within the [Installation section](../1-Installation/README.md). Afterwards,
 you should have an ODH installation, a TrustyAI Operator, and a `model-namespace` project containing
 an instance of the TrustyAI Service.
 
