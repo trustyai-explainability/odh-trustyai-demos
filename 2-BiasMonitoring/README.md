@@ -38,7 +38,7 @@ an instance of the TrustyAI Service.
 
 ## Deploy Models
 1) Navigate to the `model-namespace` created in the setup section: `oc project model-namespace`
-2) Deploy the model's storage container: `oc apply -f resources/model_storage_container`
+2) Deploy the model's storage container: `oc apply -f resources/model_storage_container.yaml`
 3) Deploy the OVMS 1.x serving runtime: `oc apply -f resources/ovms-1.x.yaml`
 4) Deploy the first model: `oc apply -f resources/model_alpha.yaml`
 5) Deploy the second model: `oc apply -f resources/model_beta.yaml`
