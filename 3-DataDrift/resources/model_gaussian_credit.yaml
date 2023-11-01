@@ -1,0 +1,15 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: gaussian-credit-model
+  annotations:
+    serving.kserve.io/deploymentMode: ModelMesh
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: xgboost
+      runtime: mlserver-1.x
+      storage:
+        key: aws-connection-minio-data-connection
+        path: sklearn/gaussian_credit_model.json
