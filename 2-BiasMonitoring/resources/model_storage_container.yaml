@@ -43,7 +43,7 @@ metadata:
   annotations:
     opendatahub.io/connection-type: s3
     openshift.io/display-name: Minio Data Connection
-data:
+data: #these are dummy values to populate the ODH UI with, and do not correspond to any real AWS credentials
   AWS_ACCESS_KEY_ID: VEhFQUNDRVNTS0VZ
   AWS_DEFAULT_REGION: dXMtc291dGg=
   AWS_S3_BUCKET: bW9kZWxtZXNoLWV4YW1wbGUtbW9kZWxz
