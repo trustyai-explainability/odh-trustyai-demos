@@ -1,7 +1,7 @@
 # OpenDataHub TrustyAI Demos
 This repo contains a variety of demos showcasing TrustyAI's capabilities within Open Data Hub.
 
-**Caveat**: Tthe material in these demo is tested to work on OpenDataHub, there is no guarantee or expectation that the demos will work on Red Hat OpenShift AI. 
+**Caveat**: These demos are tested and intended to work on Open Data Hub, there is no guarantee or expectation that they will work on Red Hat OpenShift AI, nor is a failure for these demos to work on RHOAI necessarily an indication of bugs/issues. 
 
 ## Contents
 1) [Installing OpenDataHub and TrustyAI](1-Installation/README.md): How to install Open Data Hub and TrustyAI on your cluster.
