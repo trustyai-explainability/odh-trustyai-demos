@@ -95,7 +95,8 @@
     -   **odh_data_connection_name** : Data connection name that is created for your AWS S3 / IBM COS instance in [Setup](#setup). This is required to retrieve the Model Trust model from object storage and deploy on Model Mesh. Defaults to "aws-connection-samples3".
     -   **odh_ds_project_name** : Data science project name that is created for Model Trust demo in [Setup](#setup). This is required to deploy the Model Trust model on Model Mesh. Defaults to "model-trust-ds-project".
     -   **region_type** : Region model that to be used to predict intervals. It must be one of "single_region", "multi_region". **single_region** predicts single region for the entire data. This usually is broader and may not be useful for datasets with varying distribution. **multi_region** predicts multiple regions in the dataset. This is useful to predict complex patterns in the dataset. When this option is selected, you may configure **multi_region_min_group_size**, **multi_region_model_selection_metric**, and **multi_region_model_selection_stat** as required. Defaults to "multi_region".
-
+4. After the pipeline execution is completed, you can find the model service name from input/output details of `deploy-model-trust-model` stage.
+<img src="images/model_service_name.png" width="600">
 
 Jump to [Deploy Model Trust Pipeline From Python](#deploy-model-trust-pipeline-from-python), if you like to do any of the following customizations.
 *  customize the object storage for calibration data, base regression model, or trained Model Trust model.
