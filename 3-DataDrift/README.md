@@ -83,7 +83,7 @@ We can verify that TrustyAI has received the data via `/info` endpoint:
 As you can see, the models does not provide particularly useful field names for our inputs and outputs (all some form of `credit_inputs-x`). We can apply a set of _name mappings_ to these to apply meaningful names to the fields. This is done via POST'ing the `/info/names` endpoint:
 
 ```shell
-curl -sk  -X POST --location https://trustyai-service-opendatahub-model.apps.trustyai.dzzt.p1.openshiftapps.com/info/names \
+curl -sk  -X POST --location $TRUSTY_ROUTE/info/names \
   -H "Content-Type: application/json"   \
   -d "{
     \"modelId\": \"gaussian-credit-model\",
