@@ -82,7 +82,7 @@ To compute the model's cumulative fairness up to this point, we can check the `/
 
 ```shell
 echo "=== MODEL ALPHA ==="
-curl -sk  -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd/ \
+curl -sk -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd/ \
      --header 'Content-Type: application/json' \
      --data "{
                  \"modelId\": \"demo-loan-nn-onnx-alpha\",
@@ -95,7 +95,7 @@ curl -sk  -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd/ \
              }" 
         
 echo "\n=== MODEL BETA ==="     
-curl -sk  -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd \
+curl -sk -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd \
      --header 'Content-Type: application/json' \
      --data "{
                  \"modelId\": \"demo-loan-nn-onnx-beta\",
@@ -152,7 +152,7 @@ such as to compute at recurring intervals throughout deployment. To do this, we 
 
 ```shell
 echo "=== MODEL ALPHA ==="
-curl -sk  -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd/request \
+curl -sk -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd/request \
      --header 'Content-Type: application/json' \
      --data "{
                  \"modelId\": \"demo-loan-nn-onnx-alpha\",
@@ -165,7 +165,7 @@ curl -sk  -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd/request \
              }" 
         
 echo "\n=== MODEL BETA ==="     
-curl -sk  -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd/request \
+curl -sk -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/metrics/group/fairness/spd/request \
      --header 'Content-Type: application/json' \
      --data "{
                  \"modelId\": \"demo-loan-nn-onnx-beta\",
@@ -185,7 +185,7 @@ Furthermore, let's monitor the average values of various data fields over time, 
 ```shell
 for model in "demo-loan-nn-onnx-alpha" "demo-loan-nn-onnx-beta"; do
   for field in "Is Male-Identifying?" "Will Default?"; do 
-      curl -sk  -X POST --location $TRUSTY_ROUTE/metrics/identity/request \
+      curl -sk -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/metrics/identity/request \
        --header 'Content-Type: application/json' \
        --data "{
                  \"columnName\": \"$field\",

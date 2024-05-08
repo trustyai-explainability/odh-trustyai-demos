@@ -3,7 +3,7 @@ MODEL_BETA=demo-loan-nn-onnx-beta
 TRUSTY_ROUTE=https://$(oc get route/trustyai-service --template={{.spec.host}})
 
 for model in $MODEL_ALPHA $MODEL_BETA; do
-  curl -sk  -X POST --location $TRUSTY_ROUTE/info/names \
+  curl -sk  -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/info/names \
       -H "Content-Type: application/json" \
       -d "{
           \"modelId\": \"$model\",
