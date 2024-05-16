@@ -36,13 +36,15 @@ your cluster management UI (for example, on console.redhat.com)
 ## ODH v2.x
 If the provided ODH version in your cluster's OperatorHub is version 2.x, use the following steps:
 
-### Prerequisties
+### ODH Prerequisties
 1) Install the community Authorino Operator. At the time of writing, Authorino 0.11.1 is verified to be compatible.
+2) Install the Red Hat OpenShift Serverless operator.
+3) Install the  Red Hat OpenShift Service Mesh operator.
 
 ### Install ODH (ODH v2.x)
 1) Navigate to your `opendatahub` project
 2) From "Installed Operators", select "Open Data Hub Operator".
-3) Navigate to the "DSC Initialization" tab and hit "Create DSCInitialization", then install the default DSCI.
+3) Navigate to the "DSC Initialization" tab and hit "Create DSCInitialization", then install the default DSCI. Once the DSCI reports "Ready", move on to step 4. 
 4) Navigate to the "Data Science Cluster" tab and hit "Create DataScienceCluster"
 5) In the YAML view Make sure `trustyai` is set to `Managed`:
 ![ODH V2 YAML](images/odh_V2.png)
