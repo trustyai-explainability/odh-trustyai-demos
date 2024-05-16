@@ -39,7 +39,7 @@ If the provided ODH version in your cluster's OperatorHub is version 2.x, use th
 ### ODH Prerequisties
 1) Install the community Authorino Operator. At the time of writing, Authorino 0.11.1 is verified to be compatible.
 2) Install the Red Hat OpenShift Serverless operator.
-3) Install the  Red Hat OpenShift Service Mesh operator.
+3) Install the Red Hat OpenShift Service Mesh operator.
 
 ### Install ODH (ODH v2.x)
 1) Navigate to your `opendatahub` project
