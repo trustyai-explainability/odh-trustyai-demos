@@ -9,8 +9,8 @@ blank cluster, you will be left with:
 ## Cluster Setup
 1) Make sure you are `oc login`'d to your OpenShift cluster
 2) Create two projects, `opendatahub` and `model-namespace`. These names are arbitrary, but I'll be using them throughout the rest of this demo:
-   1) `oc create project opendatahub`
-   2) `oc create project model-namespace`
+   1) `oc new-project opendatahub`
+   2) `oc new-project model-namespace`
 3) Prepare the `model-namespace` for ODH's model serving: `oc label namespace model-namespace "modelmesh-enabled=true" --overwrite=true`
 
 ## Enable User-Workload-Monitoring
