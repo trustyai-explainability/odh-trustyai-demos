@@ -25,7 +25,7 @@ use the following information about the applicant to make their prediction:
 * Length of Employment (in days)
 
 What we want to verify is that neither of our models are not biased over the gender field of `Is Male-Identifying?`. To do this,
-we will monitor our models with *Statistical Parity Difference (SPD)* metric, which will tell us how the difference betweem how often
+we will monitor our models with *Statistical Parity Difference (SPD)* metric, which will tell us how the difference between how often
 male-identifying and non-male-identifying applicants are given favorable predictions (i.e., they are predicted
 to pay back their loans). Ideally, the SPD value would be 0, indicating that both groups have equal likelihood of getting a good outcome. However, an SPD value between -0.1 and 0.1 is also indicative of reasonable fairness,
 indicating that the two groups' rates of getting good outcomes only varies by +/-10%.
@@ -38,7 +38,7 @@ an instance of the TrustyAI Service.
 
 > ✏️ TrustyAI endpoints are authenticated via a Bearer token. To obtain this token, run the following command:
 > ```shell
->export TOKEN=$(oc whoami -t)
+> export TOKEN=$(oc whoami -t)
 > ```
 
 ## Deploy Models
