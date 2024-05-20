@@ -9,8 +9,8 @@ blank cluster, you will be left with:
 ## Cluster Setup
 1) Make sure you are `oc login`'d to your OpenShift cluster
 2) Create two projects, `opendatahub` and `model-namespace`. These names are arbitrary, but I'll be using them throughout the rest of this demo:
-   1) `oc create project opendatahub`
-   2) `oc create project model-namespace`
+   1) `oc new-project opendatahub`
+   2) `oc new-project model-namespace`
 3) Prepare the `model-namespace` for ODH's model serving: `oc label namespace model-namespace "modelmesh-enabled=true" --overwrite=true`
 
 ## Enable User-Workload-Monitoring
@@ -36,20 +36,27 @@ your cluster management UI (for example, on console.redhat.com)
 ## ODH v2.x
 If the provided ODH version in your cluster's OperatorHub is version 2.x, use the following steps:
 
+### ODH Prerequisties
+1) Install the community Authorino Operator. At the time of writing, Authorino 0.11.1 is verified to be compatible.
+2) Install the Red Hat OpenShift Serverless operator.
+3) Install the Red Hat OpenShift Service Mesh operator.
+
 ### Install ODH (ODH v2.x)
 1) Navigate to your `opendatahub` project
 2) From "Installed Operators", select "Open Data Hub Operator".
-3) Navigate to the "Data Science Cluster" tab and hit "Create DataScienceCluster"
-4) In the YAML view Make sure `trustyai` is set to `Managed`:
+3) Navigate to the "DSC Initialization" tab and hit "Create DSCInitialization", then install the default DSCI. Once the DSCI reports "Ready", move on to step 4. 
+4) Navigate to the "Data Science Cluster" tab and hit "Create DataScienceCluster"
+5) In the YAML view Make sure `trustyai` is set to `Managed`:
 ![ODH V2 YAML](images/odh_V2.png)
-5) Hit the "Create" button
-6) Within the "Pods" menu, you should begin to see various ODH components being created, including the `trustyai-service-operator-controller-manager-xxx`
+6) Hit the "Create" button
+7) Within the "Pods" menu, you should begin to see various ODH components being created, including the `trustyai-service-operator-controller-manager-xxx`
 
 ### Install TrustyAI (ODH v2.x)
 1) Navigate to your `model-namespace` project: `oc project model-namespace`
 2) Run `oc apply -f resources/trustyai_crd.yaml`. This will install the TrustyAI Service
 into your `model-namespace` project, which will then provide TrustyAI features to all subsequent models deployed into that project, such as explainability, fairness monitoring, and data drift monitoring, 
 
+# Legacy Installation Steps
 ## ODH v1.x (legacy)
 If the provided ODH version in your cluster's OperatorHub is version 1.x, use the following steps:
 ### Install ODH (ODH v1.x)
