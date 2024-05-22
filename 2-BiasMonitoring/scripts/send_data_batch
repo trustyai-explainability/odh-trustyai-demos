@@ -22,7 +22,7 @@ INFER_ROUTE_BETA=$(oc get route demo-loan-nn-onnx-beta --template={{.spec.host}}
 TOKEN=$(oc whoami -t)
 
 function curl_token() {
-    curl -s -H "Authorization: Bearer ${TOKEN}"  "$@"
+    curl -sk -H "Authorization: Bearer ${TOKEN}"  "$@"
 }
 
 function check_for_reception () {
