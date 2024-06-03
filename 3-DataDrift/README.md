@@ -38,9 +38,14 @@ Follow the instructions within the [Installation section](../1-Installation/READ
 you should have an ODH installation, a TrustyAI Operator, and a `model-namespace` project containing
 an instance of the TrustyAI Service.
 
+> ✏️ TrustyAI endpoints are authenticated via a Bearer token. To obtain this token, run the following command:
+> ```shell
+> export TOKEN=$(oc whoami -t)
+> ```
+
 ## Deploy Model
 1) Navigate to the `model-namespace` created in the setup section: `oc project model-namespace`
-2) Deploy the model's storage container: `oc apply -f resources/model_storage_container`
+2) Deploy the model's storage container: `oc apply -f resources/model_storage_container.yaml`
 3) Deploy the Seldon MLServer serving runtime: `oc apply -f resources/odh-mlserver-1.x.yaml`
 4) Deploy the credit model: `oc apply -f resources/model_guassian_credit.yaml`
 6) From the OpenShift Console, navigate to the `model-namespace` project and look at the Workloads -> Pods screen.
@@ -58,7 +63,7 @@ TRUSTY_ROUTE=https://$(oc get route/trustyai-service --template={{.spec.host}})
 Next, we'll send our training data to the `/data/upload` endpoint 
 
 ```shell
-curl -sk $TRUSTY_ROUTE/data/upload  \
+curl -sk -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/data/upload  \
   --header 'Content-Type: application/json' \
   -d @data/training_data.json
 ```
@@ -83,7 +88,7 @@ We can verify that TrustyAI has received the data via `/info` endpoint:
 As you can see, the models does not provide particularly useful field names for our inputs and outputs (all some form of `credit_inputs-x`). We can apply a set of _name mappings_ to these to apply meaningful names to the fields. This is done via POST'ing the `/info/names` endpoint:
 
 ```shell
-curl -sk  -X POST --location $TRUSTY_ROUTE/info/names \
+curl -sk -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/info/names \
   -H "Content-Type: application/json"   \
   -d "{
     \"modelId\": \"gaussian-credit-model\",
@@ -109,7 +114,7 @@ features of our model.
 To schedule a recurring drift monitoring metric, we'll POST the `/metrics/drift/meanshift/request`
 
 ```shell
-curl -k -X POST --location $TRUSTY_ROUTE/metrics/drift/meanshift/request -H "Content-Type: application/json" \
+curl -k -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/metrics/drift/meanshift/request -H "Content-Type: application/json" \
   -d "{
         \"modelId\": \"gaussian-credit-model\",
         \"referenceTag\": \"TRAINING\"
@@ -137,7 +142,7 @@ MODEL_ROUTE=https://$(oc get route/gaussian-credit-model --template={{.spec.host
 2) Send data payloads to model:
 ```shell
 for batch in {0..595..5}; do
-  curl -k $MODEL_ROUTE/v2/models/gaussian-credit-model/infer -d @data/data_batches/$batch.json
+  curl -k -H "Authorization: Bearer ${TOKEN}" $MODEL_ROUTE/v2/models/gaussian-credit-model/infer -d @data/data_batches/$batch.json
   sleep 1
 done
 ```
