@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: user-workload-monitoring-config
   namespace: openshift-user-workload-monitoring
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: ""
 data:
   config.yaml: |
     prometheus:
