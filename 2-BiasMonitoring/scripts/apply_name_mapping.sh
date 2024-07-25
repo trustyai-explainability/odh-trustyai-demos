@@ -26,4 +26,5 @@ for model in $MODEL_ALPHA $MODEL_BETA; do
                   \"predict\": \"Will Default?\"
               }
       }"
+  echo
 done
