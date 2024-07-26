@@ -47,7 +47,7 @@ an instance of the TrustyAI Service.
 1) Navigate to the `model-namespace` created in the setup section: `oc project model-namespace`
 2) Deploy the model's storage container: `oc apply -f resources/model_storage_container.yaml`
 3) Deploy the Seldon MLServer serving runtime: `oc apply -f resources/odh-mlserver-1.x.yaml`
-4) Deploy the credit model: `oc apply -f resources/model_guassian_credit.yaml`
+4) Deploy the credit model: `oc apply -f resources/model_gaussian_credit.yaml`
 6) From the OpenShift Console, navigate to the `model-namespace` project and look at the Workloads -> Pods screen.
    1) You should see at least four pods named `modelmesh-serving-mlserver--1.x-xxxxx`
    2) Once the TrustyAI Service registers the deployed models, you will see the `
