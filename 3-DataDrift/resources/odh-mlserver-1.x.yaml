@@ -27,7 +27,7 @@ spec:
 
   containers:
     - name: mlserver
-      image: seldonio/mlserver:1.3.2
+      image: quay.io/rgeada/mlserver:1.3.2 
       env:
         - name: MLSERVER_MODELS_DIR
           value: "/models/_mlserver_models/"
