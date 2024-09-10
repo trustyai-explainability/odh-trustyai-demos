@@ -30,7 +30,7 @@ spec:
           value:  THEACCESSKEY
         - name: MINIO_SECRET_KEY
           value: THESECRETKEY
-      image: quay.io/trustyai/modelmesh-minio-examples:gauss
+      image: quay.io/trustyai/modelmesh-minio-examples:latest
       name: minio
 ---
 apiVersion: v1
