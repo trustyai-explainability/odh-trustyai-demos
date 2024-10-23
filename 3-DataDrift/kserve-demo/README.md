@@ -38,9 +38,11 @@ Follow the instructions within the [Installation section](../1-Installation/READ
 you should have an ODH installation, a TrustyAI Operator, and a `model-namespace` project containing
 an instance of the TrustyAI Service.
 
-> ✏️ TrustyAI endpoints are authenticated via a Bearer token. To obtain this token, run the following command:
+Since models deployed via KServe are currently authenticated by leveraging [Authorino](https://github.com/Kuadrant/authorino), it is necessary to install the Authorino Operator and configure it accordingly; refer to this [blog post](https://developers.redhat.com/articles/2024/07/22/protecting-your-models-made-easy-authorino) on how to set up Authorino on Open Data Hub.
+> ✏️ TrustyAI endpoints are authenticated via a Bearer token. To obtain this token, run the following commands:
 > ```shell
-> export TOKEN=$(oc whoami -t)
+> oc apply -f resources/trustyai_service_account.yaml
+> export TOKEN=$(oc create token user-one)   
 > ```
 
 ## Deploy Model
@@ -48,11 +50,10 @@ an instance of the TrustyAI Service.
 2) Deploy the model's storage container: `oc apply -f resources/model_storage_container.yaml`
 3) Deploy the Seldon MLServer serving runtime: `oc apply -f resources/odh-mlserver-1.x.yaml`
 4) Deploy the credit model: `oc apply -f resources/model_gaussian_credit.yaml`
-6) From the OpenShift Console, navigate to the `model-namespace` project and look at the Workloads -> Pods screen.
-   1) You should see at least four pods named `modelmesh-serving-mlserver--1.x-xxxxx`
-   2) Once the TrustyAI Service registers the deployed models, you will see the `
-modelmesh-serving-mlserver--1.x-xxxxx` pods get re-deployed. 
-   3) Verify that the models are registered with TrustyAI by selecting one of the `modelmesh-serving-ovms-1.x-xxxxx` pods. In the Environment tab, if the field `MM_PAYLOAD_PROCESSORS` is set, then your models are successfully registered with TrustyAI: ![Pods in the Model Namespace](images/model_environment.png)
+6) From the OpenShift Console, navigate to the `model-namespace` project and look at the Workloads -> Pods screen. You should see the following pods within ythe previously created [namespace](images/namespace_pods.png):
+    - one pod for the model storage container `minio`
+    - four pods for the `gaussian-credit-model`
+    - two pods for the TrustyAI Service
 
 ## Upload Model Training Data To TrustyAI
 First, we'll get the route to the TrustyAI service in our project:
@@ -76,13 +77,6 @@ four main fields:
 2) `data_tag`: A string tag to reference this particular set of data. Here, we choose `"TRAINING"`
 3) `request`: A [KServe Inference Request](https://kserve.github.io/website/0.8/modelserving/inference_api/#inference-request-json-object), as if you were sending this data directly to the model server's `/infer` endpoint. 
 4) `response`: (Optionally) the [KServe Inference Response](https://kserve.github.io/website/0.8/modelserving/inference_api/#inference-response-json-objectt) that is returned from sending the above request to the model. 
-
-## Examining TrustyAI's Model Metadata
-We can verify that TrustyAI has received the data via `/info` endpoint:
-2) Query the `/info` endpoint: `curl $TRUSTY_ROUTE/info | jq ".[0].data"`. This will output a json file ([sample provided here](resources/info_response.json)) containing the following information for the model:
-   1) The names, data types, and positions of fields in the input and output 
-   2) The observed values that these fields take (likely `null` in this case, indicating that there are too many unique feature values to merit enumerating)
-   3) The total number of input-output pairs observed, in our case, should be `1000`
 
 ## Label Data Fields
 As you can see, the models does not provide particularly useful field names for our inputs and outputs (all some form of `credit_inputs-x`). We can apply a set of _name mappings_ to these to apply meaningful names to the fields. This is done via POST'ing the `/info/names` endpoint:
@@ -109,6 +103,43 @@ You should see the message`Feature and output name mapping successfully applied.
 
 The payload of the request is a simple set of `original-name : new-name` pairs, assigning new meaningful names to the input and output
 features of our model. 
+
+## Examining TrustyAI's Model Metadata
+We can verify that TrustyAI has received the data via `/info` endpoint:
+2) Query the `/info` endpoint: `curl -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["gaussian-credit-model"].data.inputSchema'`. This will output a json file  containing the following information:
+
+```json
+{
+  "items": {
+    "Years of Education": {
+      "type": "DOUBLE",
+      "name": "credit_inputs-2",
+      "columnIndex": 2
+    },
+    "Years of Employment": {
+      "type": "DOUBLE",
+      "name": "credit_inputs-3",
+      "columnIndex": 3
+    },
+    "Age": {
+      "type": "DOUBLE",
+      "name": "credit_inputs-0",
+      "columnIndex": 0
+    },
+    "Credit Score": {
+      "type": "DOUBLE",
+      "name": "credit_inputs-1",
+      "columnIndex": 1
+    }
+  },
+  "nameMapping": {
+    "credit_inputs-0": "Age",
+    "credit_inputs-1": "Credit Score",
+    "credit_inputs-2": "Years of Education",
+    "credit_inputs-3": "Years of Employment"
+  }
+}
+```
 
 ## Register the Drift Monitoring
 To schedule a recurring drift monitoring metric, we'll POST the `/metrics/drift/meanshift/request`
@@ -137,12 +168,18 @@ the reference distribution.
 ## Collect "Real-World" Inferences
 1) Get the route to the model: 
 ```shell
-MODEL_ROUTE=https://$(oc get route/gaussian-credit-model --template={{.spec.host}})
+MODEL=gaussian-credit-model
+BASE_ROUTE=$(oc get inferenceservice gaussian-credit-model -o jsonpath='{.status.url}')
+MODEL_ROUTE="${BASE_ROUTE}/v2/models/${MODEL}/infer"
 ```
 2) Send data payloads to model:
 ```shell
 for batch in {0..595..5}; do
-  curl -k -H "Authorization: Bearer ${TOKEN}" $MODEL_ROUTE/v2/models/gaussian-credit-model/infer -d @data/data_batches/$batch.json
+  curl -sk \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d @data/data_batches/$batch.json \
+  "${MODEL_ROUTE}"
   sleep 1
 done
 ```
