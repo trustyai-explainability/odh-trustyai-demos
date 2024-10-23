@@ -3,13 +3,19 @@ kind: InferenceService
 metadata:
   name: gaussian-credit-model
   annotations:
-    serving.kserve.io/deploymentMode: ModelMesh
+    openshift.io/display-name: gaussian-credit-model
+    security.opendatahub.io/enable-auth: "true"
+    serving.knative.openshift.io/enablePassthrough: "true"
+    sidecar.istio.io/inject: "true"
+    sidecar.istio.io/rewriteAppHTTPProbers: "true"
+  labels:
+    modelClass: xgboost
 spec:
   predictor:
     model:
       modelFormat:
         name: xgboost
-      runtime: mlserver-1.x
+      runtime: kserve-mlserver
       storage:
         key: aws-connection-minio-data-connection
-        path: sklearn/gaussian_credit_model.json
+        path: sklearn/gaussian_credit_model/1/
