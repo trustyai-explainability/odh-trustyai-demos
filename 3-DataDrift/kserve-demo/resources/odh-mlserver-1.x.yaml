@@ -1,0 +1,69 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: kserve-mlserver
+  annotations:
+    opendatahub.io/accelerator-name: ""
+    opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
+    opendatahub.io/template-display-name: KServe MLServer
+    opendatahub.io/template-name: kserve-mlserver
+    openshift.io/display-name: mlserver-1.x
+    prometheus.kserve.io/path: "/metrics"
+    prometheus.io/port: "8080"
+  labels:
+    opendatahub.io/dashboard: "true"
+spec:
+  containers:
+    - name: kserve-container
+      image: quay.io/rh-ee-mmisiura/mlserver:1.6.1 
+      env:
+        - name: "MLSERVER_MODEL_IMPLEMENTATION"
+          value: "{{.Labels.modelClass}}"
+        - name: "MLSERVER_HTTP_PORT"
+          value: "8080"
+        - name: "MLSERVER_GRPC_PORT"
+          value: "9000"
+        - name: "MODELS_DIR"
+          value: "/mnt/models/"
+      resources:
+        requests:
+          cpu: "1"
+          memory: 2Gi
+        limits:
+          cpu: "1"
+          memory: 2Gi
+  supportedModelFormats:
+    - name: sklearn
+      version: "0"
+      autoSelect: true
+      priority: 2
+    - name: sklearn
+      version: "1"
+      autoSelect: true
+      priority: 2
+    - name: xgboost
+      version: "1"
+      autoSelect: true
+      priority: 2
+    - name: xgboost
+      version: "2"
+      autoSelect: true
+      priority: 2
+    - name: lightgbm
+      version: "3"
+      autoSelect: true
+      priority: 2
+    - name: lightgbm
+      version: "4"
+      autoSelect: true
+      priority: 2
+    - name: mlflow
+      version: "1"
+      autoSelect: true
+      priority: 1
+    - name: mlflow
+      version: "2"
+      autoSelect: true
+      priority: 1
+  protocolVersions:
+    - v2
