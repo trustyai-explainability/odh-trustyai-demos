@@ -11,7 +11,9 @@ blank cluster, you will be left with:
 2) Create two projects, `opendatahub` and `model-namespace`. These names are arbitrary, but I'll be using them throughout the rest of this demo:
    1) `oc new-project opendatahub`
    2) `oc new-project model-namespace`
-3) Prepare the `model-namespace` for ODH's model serving: `oc label namespace model-namespace "modelmesh-enabled=true" --overwrite=true`
+  
+## If you plan on using Modelmesh (skip otherwise):
+1) Prepare the `model-namespace` for ODH's model serving: `oc label namespace model-namespace "modelmesh-enabled=true" --overwrite=true`
 
 ## Enable User-Workload-Monitoring
 To get enable ODH's monitoring stack , user-workload-monitoring must be configured:
