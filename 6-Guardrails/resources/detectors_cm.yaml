@@ -1,0 +1,24 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fms-orchestr8-config-gateway
+  labels:
+    app: fmstack-nlp
+data:
+  config.yaml: |
+    orchestrator:
+      host: "localhost"
+      port: 8032
+    detectors:
+      - name: regex
+        detector_params:
+          regex:
+            - email
+            - ssn
+      - name: other_detector
+    routes:
+      - name: pii
+        detectors:
+          - regex
+      - name: passthrough
+        detectors:

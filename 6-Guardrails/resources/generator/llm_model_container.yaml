@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-llm
+spec:
+  ports:
+    - name: minio-client-port
+      port: 9000
+      protocol: TCP
+      targetPort: 9000
+  selector:
+    app: minio-llm
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: llm-models-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-container-deployment
+  labels:
+    app: minio-llm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-llm
+  template:
+    metadata:
+      labels:
+        app: minio-llm
+        maistra.io/expose-route: 'true'
+      name: minio-llm
+    spec:
+      volumes:
+        - name: model-volume
+          persistentVolumeClaim:
+            claimName: llm-models-claim
+      initContainers:
+        - name: download-model
+          image: quay.io/rh-ee-mmisiura/llm-downloader-bootstrap@sha256:0034bebe904eabe40315463702275c6d33a0f22404a59b2c2d9e4d25a6cd750f
+          securityContext:
+            fsGroup: 1001
+          command:
+            - bash
+            - -c
+            - |
+              model="Qwen/Qwen2.5-0.5B-Instruct"
+              echo "starting download"
+              /tmp/venv/bin/huggingface-cli download $model --local-dir /mnt/models/llms/$(basename $model)
+              echo "Done!"
+          resources:
+            limits:
+              memory: "5Gi"
+              cpu: "2"
+          volumeMounts:
+            - mountPath: "/mnt/models/"
+              name: model-volume
+      containers:
+        - args:
+            - server
+            - /models
+          env:
+            - name: MINIO_ACCESS_KEY
+              value: THEACCESSKEY
+            - name: MINIO_SECRET_KEY
+              value: THESECRETKEY
+          image: quay.io/trustyai/modelmesh-minio-examples@sha256:65cb22335574b89af15d7409f62feffcc52cc0e870e9419d63586f37706321a5
+          name: minio-llm
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: "/models/"
+              name: model-volume
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-connection-minio-data-connection
+  labels:
+    opendatahub.io/dashboard: 'true'
+    opendatahub.io/managed: 'true'
+  annotations:
+    opendatahub.io/connection-type: s3
+    openshift.io/display-name: Minio LLM Data Connection
+data:
+  AWS_ACCESS_KEY_ID: VEhFQUNDRVNTS0VZ
+  AWS_DEFAULT_REGION: dXMtc291dGg=
+  AWS_S3_BUCKET: bGxtcw==
+  AWS_S3_ENDPOINT: aHR0cDovL21pbmlvLWxsbTo5MDAw
+  AWS_SECRET_ACCESS_KEY: VEhFU0VDUkVUS0VZ
+type: Opaque
