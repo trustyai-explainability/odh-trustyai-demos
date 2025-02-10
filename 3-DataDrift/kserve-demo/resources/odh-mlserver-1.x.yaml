@@ -15,7 +15,7 @@ metadata:
 spec:
   containers:
     - name: kserve-container
-      image: quay.io/rh-ee-mmisiura/mlserver:1.6.1 
+      image: quay.io/trustyai_testing/mlserver:1.6.1
       env:
         - name: "MLSERVER_MODEL_IMPLEMENTATION"
           value: "{{.Labels.modelClass}}"
