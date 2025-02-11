@@ -27,7 +27,7 @@ spec:
 
   containers:
     - name: mlserver
-      image: quay.io/rgeada/mlserver:1.3.2 
+      image: quay.io/trustyai_testing/mlserver:1.6.1
       env:
         - name: MLSERVER_MODELS_DIR
           value: "/models/_mlserver_models/"
