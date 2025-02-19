@@ -1,0 +1,43 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  annotations:
+    openshift.io/display-name: vLLM ServingRuntime for KServe - Float16
+  name: vllm-runtime-cpu-fp16
+  labels:
+    opendatahub.io/dashboard: 'true'
+spec:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: '8080'
+  containers:
+    - args:
+        - '--port=8032'
+        - '--model=/mnt/models'
+        - '--served-model-name={{.Name}}'
+        - '--dtype=float16'
+        - '--enforce-eager'
+      command:
+        - python
+        - '-m'
+        - vllm.entrypoints.openai.api_server
+      env:
+        - name: HF_HOME
+          value: /tmp/hf_home
+      image: 'quay.io/rh-aiservices-bu/vllm-cpu-openai-ubi9@sha256:d680ff8becb6bbaf83dfee7b2d9b8a2beb130db7fd5aa7f9a6d8286a58cebbfd'
+      name: kserve-container
+      ports:
+        - containerPort: 8032
+          protocol: TCP
+      volumeMounts:
+        - mountPath: /dev/shm
+          name: shm
+  multiModel: false
+  supportedModelFormats:
+    - autoSelect: true
+      name: vLLM
+  volumes:
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 2Gi
+      name: shm

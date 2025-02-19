@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gorch-test-config
+data:
+  regexDetectorImage: 'quay.io/csantiago/regex-detector:latest'
+  vllmGatewayImage: 'quay.io/csantiago/vllm-orchestrator-gateway:latest'
