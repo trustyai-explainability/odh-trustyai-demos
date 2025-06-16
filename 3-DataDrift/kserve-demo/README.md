@@ -41,7 +41,7 @@ an instance of the TrustyAI Service.
 Since models deployed via KServe are currently authenticated by leveraging [Authorino](https://github.com/Kuadrant/authorino), it is necessary to install the Authorino Operator and configure it accordingly; refer to this [blog post](https://developers.redhat.com/articles/2024/07/22/protecting-your-models-made-easy-authorino) on how to set up Authorino on Open Data Hub.
 > ✏️ TrustyAI endpoints are authenticated via a Bearer token. To obtain this token, run the following commands:
 > ```shell
-> oc apply -f resources/trustyai_service_account.yaml
+> oc apply -f resources/service_account.yaml
 > export TOKEN=$(oc create token user-one)   
 > ```
 
