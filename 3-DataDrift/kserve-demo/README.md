@@ -46,14 +46,22 @@ Since models deployed via KServe are currently authenticated by leveraging [Auth
 > ```
 
 ## Deploy Model
-1) Navigate to the `model-namespace` created in the setup section: `oc project model-namespace`
-2) Deploy the model's storage container: `oc apply -f resources/model_storage_container.yaml`
-3) Deploy the Seldon MLServer serving runtime: `oc apply -f resources/odh-mlserver-1.x.yaml`
-4) Deploy the credit model: `oc apply -f resources/model_gaussian_credit.yaml`
-6) From the OpenShift Console, navigate to the `model-namespace` project and look at the Workloads -> Pods screen. You should see the following pods within ythe previously created [namespace](images/namespace_pods.png):
+1) Navigate to the `model-namespace` created in the setup section
+2) Deploy the model's storage container
+3) Deploy the Seldon MLServer serving runtime
+4) Deploy the credit model
+6) From the OpenShift Console, navigate to the `model-namespace` project and look at the Workloads -> Pods screen. You should see the following pods within ythe previously created [namespace](images/namespace_pods.png)
     - one pod for the model storage container `minio`
     - four pods for the `gaussian-credit-model`
     - two pods for the TrustyAI Service
+
+The command to do all of the above is:
+```bash
+oc project model-namespace || true
+oc apply -f resources/model_storage_container.yaml
+oc apply -f resources/odh-mlserver-1.x.yaml
+oc apply -f resources/model_gaussian_credit.yaml
+```
 
 ## Upload Model Training Data To TrustyAI
 First, we'll get the route to the TrustyAI service in our project:
