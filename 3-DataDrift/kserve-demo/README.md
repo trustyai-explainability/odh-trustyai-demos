@@ -165,13 +165,6 @@ determines which data to use as the reference distribution, in our case `TRAININ
 data. This will then measure the drift of all recorded inference data against
 the reference distribution.
 
-## Check the Metrics
-1) Navigate to Observe -> Metrics in the OpenShift console. If you're already on that page, you may need to refresh before the new metrics appear in the suggested expressions.
-2) Set the time window to 5 minutes (top left) and the refresh interval to 15 seconds (top right)
-3) In the "Expression" field, enter `trustyai_meanshift`. It might take a few seconds before the cluster monitoring stacks picks up the new metric, so if `trustyai_meanshift` is not appearing, try refreshing the page.
-4) Explore the Metric Chart:
-![Initial Meanshift Chart](images/meanshift_initial.png)
-5) You'll notice that a metric is emitted for each of the four features and the single output, making for five measurements in total. All metric values should equal 1 (no drift), which makes sense: we _only_ have the training data, which can't drift from itself. 
 
 ## Collect "Real-World" Inferences
 1) Get the route to the model: 
@@ -194,9 +187,15 @@ done
 
 ## Observe Drift
 ![Post-deployment metrics](images/meanshift_post.png).
+1) Navigate to Observe -> Metrics in the OpenShift console. If you're already on that page, you may need to refresh before the new metrics appear in the suggested expressions.
+2) Set the time window to 5 minutes (top left) and the refresh interval to 15 seconds (top right)
+3) In the "Expression" field, enter `trustyai_meanshift`. It might take a few seconds before the cluster monitoring stacks picks up the new metric, so if `trustyai_meanshift` is not appearing, try refreshing the page.
+4) Explore the Metric Chart:
+![Initial Meanshift Chart](images/meanshift_initial.png)
+5) You'll notice that a metric is emitted for each of the four features and the single output, making for five measurements in total. All metric values should equal 1 (no drift), which makes sense: we _only_ have the training data, which can't drift from itself. 
 
-Navigating back to the Observe -> Metrics page in the OpenShift console, we can see the MeanShift metric
-values for the various features changes. Notably, the values for `Credit Score`, `Age`, and `Acceptance Probability` have all dropped to 0, indicating there is a statistically very high likelihood that the values of these fields in the inference data come from a different distribution than that of the training data. Meanwhile, the `Years of Employment` and `Years of Education` scores have dropped to 0.34 and 0.82 respectively, indicating that there is a little drift, but not enough to be particularly concerning. Remember, the Mean-Shift metric scores are p-values, so only values < 0.05 indicate statistical significance. 
+We can see the MeanShift metric values for the various features changes. Notably, the values for `Credit Score`, `Age`, and `Acceptance Probability` have all dropped to 0, indicating there is a statistically very high likelihood that the values of these fields in the inference data come from a different distribution than that of the training data. Meanwhile, the `Years of Employment` and `Years of Education` scores have dropped to 0.34 and 0.82 respectively, indicating that there is a little drift, but not enough to be particularly concerning. Remember, the Mean-Shift metric scores are p-values, so only values < 0.05 indicate statistical significance. 
+
 
 ## A Peek Behind The Curtain
 To better understand the what these metrics tell us, let's take a look behind the curtain at the actual data I generated for this example, and look at the real distributions of the training and inference
