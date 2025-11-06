@@ -11,25 +11,35 @@ spec:
   selector:
     app: minio
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  labels:
-    app: minio
-    maistra.io/expose-route: 'true'
-  name: minio
+  name: model-s3-storage-emulator
+labels:
+    app: minio # <--- change this to match label on the pod
 spec:
-  containers:
-    - args:
-        - server
-        - /data1
-      env:
-        - name: MINIO_ACCESS_KEY
-          value:  THEACCESSKEY
-        - name: MINIO_SECRET_KEY
-          value: THESECRETKEY
-      image: quay.io/trustyai_testing/modelmesh-minio-examples:latest
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio  # <--- change this to match label on the pod
+  template: # => from here down copy and paste the pods metadata: and spec: sections
+    metadata:
+      labels:
+        app: minio
+        maistra.io/expose-route: 'true'
       name: minio
+    spec:
+      containers:
+        - args:
+            - server
+            - /data1
+          env:
+            - name: MINIO_ACCESS_KEY
+              value:  THEACCESSKEY
+            - name: MINIO_SECRET_KEY
+              value: THESECRETKEY
+          image: quay.io/trustyai_testing/modelmesh-minio-examples:latest
+          name: minio
 ---
 apiVersion: v1
 kind: Secret
