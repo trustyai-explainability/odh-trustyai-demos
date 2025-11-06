@@ -17,8 +17,6 @@ metadata:
   labels:
     app: minio
     maistra.io/expose-route: 'true'
-  annotations:
-    sidecar.istio.io/inject: 'true'
   name: minio
 spec:
   containers:
