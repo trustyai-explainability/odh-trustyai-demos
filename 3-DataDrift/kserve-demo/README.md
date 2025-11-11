@@ -45,6 +45,10 @@ Since models deployed via KServe are currently authenticated by leveraging [Auth
 > export TOKEN=$(oc create token user-one)   
 > ```
 
+## Configure TLS 
+Follow the [Update KServe ConfigMap](https://github.com/trustyai-explainability/reference/tree/main/trustyai-service/kserve-raw/metrics#update-kserve-config-map) and [Prepare TLS](https://github.com/trustyai-explainability/reference/tree/main/trustyai-service/kserve-raw/metrics#prepare-tls) sections here. Note: if you're using Red Hat Openshift AI, all commands that use `-n opendatahub` should be replaced with `-n redhat-ods-applications`
+
+
 ## Deploy Model
 1) Navigate to the `model-namespace` created in the setup section
 2) Deploy the model's storage container
