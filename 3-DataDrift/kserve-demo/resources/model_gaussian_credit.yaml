@@ -89,6 +89,7 @@ metadata:
     sidecar.istio.io/rewriteAppHTTPProbers: "true"
   labels:
     modelClass: xgboost
+    networking.kserve.io/visibility: exposed
 spec:
   predictor:
     model:
