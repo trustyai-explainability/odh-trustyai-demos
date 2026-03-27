@@ -55,12 +55,8 @@ function check_for_reception () {
 
 function get_counter () {
   RESPONSE=$(curl_token $TRUSTY_ROUTE/info)
-  OBSERVATIONS=$(echo $RESPONSE | jq -r ".\"$1\".data.observations")
-  if [[ -z $OBSERVATIONS ]]; then
-    echo 0
-  else
-    echo $OBSERVATIONS
-  fi
+  OBSERVATIONS=$(echo "$RESPONSE" | jq -r ".\"$1\".data.observations // 0")
+  echo "$OBSERVATIONS"
 }
 
 # Init dataset counters
