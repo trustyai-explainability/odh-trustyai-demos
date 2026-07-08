@@ -1,5 +1,5 @@
 # Bias Monitoring via TrustyAI in ODH
-Ensuring that your models are fair and unbiased is a crucial part of establishing trust in your models amonst
+Ensuring that your models are fair and unbiased is a crucial part of establishing trust in your models amongst
 your users. While fairness can be explored during model training, it is only during deployment
 that your models have exposure to the outside world. It does not matter if your models are unbiased on the training data, if they are dangerously biased over real-world data, and therefore it is absolutely
 crucial to monitor your models for fairness during real-world deployments:
@@ -34,34 +34,50 @@ indicating that the two groups' rates of getting good outcomes only varies by +/
 
 
 ## Setup
-Follow the instructions within the [Installation section](../1-Installation/README.md). Afterwards,
-you should have an ODH installation, a TrustyAI Operator, and a `model-namespace` project containing
-an instance of the TrustyAI Service.
+Follow the instructions within the [Installation section](../../1-Installation/README.md). Afterwards,
+you should have an ODH/RHOAI installation, a TrustyAI Operator, and a project for deploying models.
+In particular, make sure you have:
 
-> ✏️ TrustyAI endpoints are authenticated via a Bearer token. To obtain this token, run the following commands:
-> ```shell
-> export TOKEN=$(oc create token user-one)   
-> ```
->
+1. Applied the TrustyAI Service CR to your model project:
+```shell
+oc project <your-model-namespace>
+oc apply -f ../../1-Installation/resources/trustyai.yaml
+```
+This creates the TrustyAI Service instance, the `user-one` service account (used for authentication below),
+and the CA bundle configmap needed for TLS. Wait for the TrustyAI pod to be ready before proceeding:
+```shell
+oc wait --for=condition=Available deployment/trustyai-service --timeout=300s
+```
+
+2. Verified that user workload monitoring is active (required for metrics to appear in the OpenShift console):
+```shell
+oc get pods -n openshift-user-workload-monitoring
+```
+You should see `prometheus-operator`, `prometheus-user-workload`, and `thanos-ruler` pods running.
+If the namespace is empty, apply the monitoring configuration from the Installation section:
+```shell
+oc apply -f ../../1-Installation/resources/enable_uwm.yaml
+```
+
+## Authenticate
+TrustyAI endpoints are authenticated via a Bearer token. Export the token and the TrustyAI route,
+as these are used throughout the rest of the demo:
+```shell
+export TOKEN=$(oc create token user-one)
+TRUSTY_ROUTE=https://$(oc get route/trustyai-service --template={{.spec.host}})
+```
 
 ## Deploy Models
 ```shell
-oc project model-namespace || true
 oc apply -f resources/model_storage_container.yaml; oc wait --for=condition=ready pod -l app=minio
 oc apply -f resources/models.yaml
 ```
 
-The TrustyAI service will react to the model deployment and inject a container into it. This will cause the original model deployments to be deleted, and a new
-set of 4-container deployments to be created. 
-
-4) From the OpenShift Console, navigate to the `model-namespace` project and look at the Workloads -> Pods screen. After the model deployment has settled, you should see the following pods:
-- The model storage container, with 1 container
-- The two deployed models, each with 4 containers
-- The TrustyAI Service, with 2 containers
-
-![pods](images/model_namespace_pods.png)
-
-It can sometimes take a minute or two for all the resources to deconflict, e.g., you might see the new 4-container model deployments co-existing with the old 3-container deployments. Give it a minute or two, the old 3-container will eventually be deleted.
+Make sure the models are ready before continuing:
+```shell
+oc wait --for=condition=Ready inferenceservice/demo-loan-nn-onnx-alpha --timeout=600s
+oc wait --for=condition=Ready inferenceservice/demo-loan-nn-onnx-beta --timeout=600s
+```
 
 ## Send Training Data to Models
 Here, we'll pass all the training data through the models, such as to be able to compute baseline fairness values:
@@ -81,12 +97,11 @@ This means that TrustyAI has catalogued 2250 inputs and outputs for each of the 
 ## Examining TrustyAI's Model Metadata
 We can also verify that TrustyAI sees the models via the `/info` endpoint:
 ```shell
-TRUSTY_ROUTE=https://$(oc get route/trustyai-service --template={{.spec.host}})
-curl -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-alpha"].data | {inputSchema: .inputSchema, outputSchema: .outputSchema}'
-curl -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-beta"].data | {inputSchema: .inputSchema, outputSchema: .outputSchema}'
-````
+curl -sk -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-alpha"].data | {inputSchema: .inputSchema, outputSchema: .outputSchema}'
+curl -sk -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-beta"].data | {inputSchema: .inputSchema, outputSchema: .outputSchema}'
+```
 
-Each curl command will output a json file ([sample provided here](resources/info_response.json)) containing the following information for each model:
+Each curl command will output a JSON object ([sample provided here](resources/info_response.json)) containing the following information for each model:
    1) The names, data types, and positions of fields in the input and output
    2) The total number of input-output pairs observed
 
@@ -100,8 +115,8 @@ Explore the [apply_name_mapping.sh](scripts/apply_name_mapping.sh) script to und
 After running the name mapping script, you can verify that the name mapping was successfully applied by requerying the `/info` endpoint:
 
 ```shell
-curl -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-alpha"].data | {inputSchema: .inputSchema, outputSchema: .outputSchema}'
-curl -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-beta"].data | {inputSchema: .inputSchema, outputSchema: .outputSchema}'
+curl -sk -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-alpha"].data | {inputSchema: .inputSchema, outputSchema: .outputSchema}'
+curl -sk -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["demo-loan-nn-onnx-beta"].data | {inputSchema: .inputSchema, outputSchema: .outputSchema}'
 ```
 Notice we now have a populated `nameMapping`:
 
@@ -247,6 +262,8 @@ The payload is structured as follows:
 * `modelId`: The name of the model to query
 
 ## Check the Metrics
+Before sending real-world data, open the OpenShift console so you can watch the metrics evolve in real time:
+
 1) Navigate to Observe -> Metrics in the OpenShift console. If you're already on that page, you may need to refresh before the new metrics appear in the suggested expressions.
 2) Set the time window to 5 minutes (top left) and the refresh interval to 15 seconds (top right)
 3) In the "Expression" field, enter `trustyai_spd` or `trustyai_identity`
@@ -255,7 +272,7 @@ The payload is structured as follows:
 ![Initial Identities](images/initial_identities.png)
 
 ## Simulate Some Real World Data
- Now that we've got our metric monitoring set up, let's send some "real world" data through our models to see if they remain fair:
+Now that we've got our metric monitoring set up, let's send some "real world" data through our models to see if they remain fair:
 
 ```shell
 for batch in "01" "02" "03" "04" "05" "06" "07" "08"; do
@@ -263,7 +280,7 @@ for batch in "01" "02" "03" "04" "05" "06" "07" "08"; do
   sleep 5
 done
 ```
-Once the data is being sent, return to  Observe -> Metrics page and watch the SPD and Identity metric values change.
+While the data is being sent, watch the SPD and Identity metric values change in the OpenShift console.
 
 ## Results
 Let's first look at our two models' fairness:
@@ -271,7 +288,7 @@ Let's first look at our two models' fairness:
 
 Immediately, we notice that the two models have drastically different fairnesses over the real world data. Model Alpha (blue) remained within the "acceptably fair" range between -0.1 and 0.1, ending at around 0.09. However, Model Beta (yellow) plummeted out of the fair range, ending at -0.274, meaning that non-male-identifying applicants were _*27 percent*_ less likely to get a favorable outcome from the model than male-identifying applicants; clearly an unacceptable bias.
 
-We can investigate this further by examining our identity metrics, first looking at the inbound ratio of male-identifying to non-male-identufying applicants:
+We can investigate this further by examining our identity metrics, first looking at the inbound ratio of male-identifying to non-male-identifying applicants:
 ![Final Male-Identifying Values](images/final_male_ident.png)
 
 We can immediately see that in our training data, the ratio between male/non-male was around 0.8, but in the real-world data, it quickly dropped to _*0*_, meaning every single applicant was non-male. This is a strong indicator that our

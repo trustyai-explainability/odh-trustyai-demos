@@ -11,17 +11,13 @@ MODEL_VERSION_ALPHA=1
 MODEL_BETA=demo-loan-nn-onnx-beta
 MODEL_VERSION_BETA=1
 
-ODHPROJECT=opendatahub
-MM_NAMESPACE=model-namespace
-
-oc project $MM_NAMESPACE 2>&1 1>/dev/null
 TRUSTY_POD=$(oc get pods -o name | grep trustyai-service)
 TRUSTY_ROUTE=https://$(oc get route/trustyai-service --template={{.spec.host}})
 
-BASE_ROUTE_ALPHA=$(oc get inferenceservice demo-loan-nn-onnx-alpha -o jsonpath='{.status.url}')
+BASE_ROUTE_ALPHA=https://$(oc get route demo-loan-nn-onnx-alpha -o jsonpath='{.spec.host}')
 INFER_ROUTE_ALPHA="${BASE_ROUTE_ALPHA}/v2/models/${MODEL_ALPHA}/versions/${MODEL_VERSION_ALPHA}/infer"
 
-BASE_ROUTE_BETA=$(oc get inferenceservice demo-loan-nn-onnx-beta -o jsonpath='{.status.url}')
+BASE_ROUTE_BETA=https://$(oc get route demo-loan-nn-onnx-beta -o jsonpath='{.spec.host}')
 INFER_ROUTE_BETA="${BASE_ROUTE_BETA}/v2/models/${MODEL_BETA}/versions/${MODEL_VERSION_BETA}/infer"
 
 

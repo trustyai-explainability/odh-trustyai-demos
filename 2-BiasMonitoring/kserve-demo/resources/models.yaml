@@ -73,6 +73,7 @@ metadata:
     sidecar.istio.io/rewriteAppHTTPProbers: "true"
   labels:
     opendatahub.io/dashboard: "true"
+    networking.kserve.io/visibility: exposed
 spec:
   predictor:
     maxReplicas: 1
@@ -105,6 +106,7 @@ metadata:
     sidecar.istio.io/rewriteAppHTTPProbers: "true"
   labels:
     opendatahub.io/dashboard: "true"
+    networking.kserve.io/visibility: exposed
 spec:
   predictor:
     maxReplicas: 1
