@@ -34,38 +34,56 @@ while a p-value < 0.05 indicates a statistically significant drift between the t
 would be better suited for different or unknown data distributions.
 
 ## Setup
-Follow the instructions within the [Installation section](../1-Installation/README.md). Afterwards,
-you should have an ODH installation, a TrustyAI Operator, and a `model-namespace` project containing
-an instance of the TrustyAI Service.
+Follow the instructions within the [Installation section](../../1-Installation/README.md). Afterwards,
+you should have an ODH/RHOAI installation, a TrustyAI Operator, and a project for deploying models.
+In particular, make sure you have:
 
-> ✏️ TrustyAI endpoints are authenticated via a Bearer token. To obtain this token, run the following commands:
-> ```shell
-> export TOKEN=$(oc create token user-one)   
-> ```
+1. Applied the TrustyAI Service CR to your model project:
+```shell
+oc project <your-model-namespace>
+oc apply -f ../../1-Installation/resources/trustyai.yaml
+```
+This creates the TrustyAI Service instance, the `user-one` service account (used for authentication below),
+and the CA bundle configmap needed for TLS. Wait for the TrustyAI pod to be ready before proceeding:
+```shell
+oc wait --for=condition=Available deployment/trustyai-service --timeout=300s
+```
+
+2. Verified that user workload monitoring is active (required for metrics to appear in the OpenShift console):
+```shell
+oc get pods -n openshift-user-workload-monitoring
+```
+You should see `prometheus-operator`, `prometheus-user-workload`, and `thanos-ruler` pods running.
+If the namespace is empty, apply the monitoring configuration from the Installation section:
+```shell
+oc apply -f ../../1-Installation/resources/enable_uwm.yaml
+```
+
+## Authenticate
+TrustyAI endpoints are authenticated via a Bearer token. Export the token and the TrustyAI route,
+as these are used throughout the rest of the demo:
+```shell
+export TOKEN=$(oc create token user-one)
+TRUSTY_ROUTE=https://$(oc get route/trustyai-service --template={{.spec.host}})
+```
 
 ## Deploy Model
 ```shell
-oc project model-namespace || true
 oc apply -f resources/model_storage_container.yaml; oc wait --for=condition=ready pod -l app=minio
 oc apply -f resources/model_gaussian_credit.yaml
 ```
 
-Similarly to the bias tutorial, make sure that you've got a model pod with 4/4 containers ready before continuing. The following command
-will continuously check for your model's readiness and will finish when the pod is ready to use:
+Make sure that the model is ready before continuing. The following command
+will continuously check for your model's readiness and will finish when the model is ready to use:
 ```shell
-oc wait --for=condition=Available deployment/gaussian-credit-model-predictor-00002-deployment --timeout=600s
-````
-
-## Upload Model Training Data To TrustyAI
-First, we'll get the route to the TrustyAI service in our project:
-```shell
-TRUSTY_ROUTE=https://$(oc get route/trustyai-service --template={{.spec.host}})
+oc wait --for=condition=Ready inferenceservice/gaussian-credit-model --timeout=600s
 ```
 
-Next, we'll send our training data to the `/data/upload` endpoint 
+## Upload Model Training Data To TrustyAI
+Send the training data to the `/data/upload` endpoint:
 
 ```shell
-curl -sk -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/data/upload  \
+curl -sk -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/data/upload \
   --header 'Content-Type: application/json' \
   -d @data/training_data.json
 ```
@@ -80,11 +98,11 @@ four main fields:
 4) `response`: (Optionally) the [KServe Inference Response](https://kserve.github.io/website/0.8/modelserving/inference_api/#inference-response-json-objectt) that is returned from sending the above request to the model. 
 
 ## Label Data Fields
-As you can see, the models does not provide particularly useful field names for our inputs and outputs (all some form of `credit_inputs-x`). We can apply a set of _name mappings_ to these to apply meaningful names to the fields. This is done via POST'ing the `/info/names` endpoint:
+As you can see, the model does not provide particularly useful field names for our inputs and outputs (all some form of `credit_inputs-x`). We can apply a set of _name mappings_ to these to apply meaningful names to the fields. This is done via POST'ing the `/info/names` endpoint:
 
 ```shell
 curl -sk -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/info/names \
-  -H "Content-Type: application/json"   \
+  -H "Content-Type: application/json" \
   -d "{
     \"modelId\": \"gaussian-credit-model\",
     \"inputMapping\":
@@ -100,7 +118,7 @@ curl -sk -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/in
   }"
 ```
 
-You should see the message`Feature and output name mapping successfully applied.`
+You should see the message `Feature and output name mapping successfully applied.`
 
 The payload of the request is a simple set of `original-name : new-name` pairs, assigning new meaningful names to the input and output
 features of our model. 
@@ -108,9 +126,9 @@ features of our model.
 ## Examining TrustyAI's Model Metadata
 We can verify that TrustyAI has received the data via `/info` endpoint:
 ```shell
-curl -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["gaussian-credit-model"].data.inputSchema'
+curl -sk -H "Authorization: Bearer ${TOKEN}" $TRUSTY_ROUTE/info | jq '.["gaussian-credit-model"].data.inputSchema'
 ```
-This will output a json file  containing the following information:
+This will output a JSON object containing the following information:
 
 ```json
 {
@@ -146,10 +164,11 @@ This will output a json file  containing the following information:
 ```
 
 ## Register the Drift Monitoring
-To schedule a recurring drift monitoring metric, we'll POST the `/metrics/drift/meanshift/request`
+To schedule a recurring drift monitoring metric, we'll POST the `/metrics/drift/meanshift/request`:
 
 ```shell
-curl -k -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/metrics/drift/meanshift/request -H "Content-Type: application/json" \
+curl -sk -H "Authorization: Bearer ${TOKEN}" -X POST --location $TRUSTY_ROUTE/metrics/drift/meanshift/request \
+  -H "Content-Type: application/json" \
   -d "{
         \"modelId\": \"gaussian-credit-model\",
         \"referenceTag\": \"TRAINING\"
@@ -162,14 +181,21 @@ data. This will then measure the drift of all recorded inference data against th
 
 > ## About Meanshift
 > The metric we'll be computing is called Meanshift, and measures the probability that a data sample comes from a different distribution as some reference dataset. 
-> A meanshift value less than 0.05 indicates a stastically significant difference in the two distributions, i.e., data drift! TrustyAI will export one meanshift metric per column in your model data- so one metric per feature column, and one metric per output column, and they indicate the probability that the data in the column has diverged from your reference dataset.
+> A meanshift value less than 0.05 indicates a statistically significant difference in the two distributions, i.e., data drift! TrustyAI will export one meanshift metric per column in your model data — so one metric per feature column, and one metric per output column, and they indicate the probability that the data in the column has diverged from your reference dataset.
+
+## Observe Drift
+Before sending inference data, open the OpenShift console so you can watch the metrics evolve in real time:
+
+1) Navigate to Observe -> Metrics in the OpenShift console. If you're already on that page, you may need to refresh before the new metrics appear in the suggested expressions.
+2) Set the time window to 5 minutes (top left) and the refresh interval to 15 seconds (top right).
+3) In the "Expression" field, enter `trustyai_meanshift`. It might take a few seconds before the cluster monitoring stack picks up the new metric, so if `trustyai_meanshift` is not appearing, try refreshing the page.
 
 ## Collect "Real-World" Inferences
-With the drift metric setup, the TrustyAI service will start producing drift metrics as soon as inference data begins arriving. To simulate receiving 
-"real-world" inference data, we'll set up a script to send a handful of inference payloads every second, and leave that running for a few minutes:
-2) Get the route to the model: 
+With the metrics console open and the drift metric registered, the TrustyAI service will start producing drift metrics as soon as inference data begins arriving. To simulate receiving 
+"real-world" inference data, we'll send a handful of inference payloads every second:
+
 ```shell
-MODEL_ROUTE=$(oc get inferenceservice gaussian-credit-model -o jsonpath='{.status.url}')/v2/models/gaussian-credit-model/infer
+MODEL_ROUTE=https://$(oc get route gaussian-credit-model -o jsonpath='{.spec.host}')/v2/models/gaussian-credit-model/infer
 for batch in {0..595..5}; do
   curl -sk \
   -H "Authorization: Bearer ${TOKEN}" \
@@ -180,20 +206,15 @@ for batch in {0..595..5}; do
 done
 ```
 
-## Observe Drift
-While that script is running, let's go watch the drift metrics in real time!
+While the script runs, watch the Metric Chart in the OpenShift console:
 
-1) Navigate to Observe -> Metrics in the OpenShift console. If you're already on that page, you may need to refresh before the new metrics appear in the suggested expressions.
-2) Set the time window to 5 minutes (top left) and the refresh interval to 15 seconds (top right)
-3) In the "Expression" field, enter `trustyai_meanshift`. It might take a few seconds before the cluster monitoring stacks picks up the new metric, so if `trustyai_meanshift` is not appearing, try refreshing the page.
-4) Explore the Metric Chart:
 ![Post-deployment metrics](images/meanshift_post.png)
 
 We can see the MeanShift metric
-values for the various features changes. Notably, the values for `Credit Score`, `Age`, and `Acceptance Probability` have all dropped to 0, indicating there is a statistically very high likelihood that the values of these fields in the inference data come from a different distribution than that of the training data. Meanwhile, the `Years of Employment` and `Years of Education` scores have dropped to 0.34 and 0.82 respectively, indicating that there is a little drift, but not enough to be particularly concerning. Remember, the Mean-Shift metric scores are p-values, so only values < 0.05 indicate statistical significance. 
+values for the various features change. Notably, the values for `Credit Score`, `Age`, and `Acceptance Probability` have all dropped to 0, indicating there is a statistically very high likelihood that the values of these fields in the inference data come from a different distribution than that of the training data. Meanwhile, the `Years of Employment` and `Years of Education` scores have dropped to 0.34 and 0.82 respectively, indicating that there is a little drift, but not enough to be particularly concerning. Remember, the Mean-Shift metric scores are p-values, so only values < 0.05 indicate statistical significance. 
 
 ## A Peek Behind The Curtain
-To better understand the what these metrics tell us, let's take a look behind the curtain at the actual data I generated for this example, and look at the real distributions of the training and inference
+To better understand what these metrics tell us, let's take a look behind the curtain at the actual data I generated for this example, and look at the real distributions of the training and inference
 datasets:
 
 ![Real Data Distributions](images/gaussian_credit_model_distributions.png)
