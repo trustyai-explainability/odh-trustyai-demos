@@ -1,0 +1,787 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  annotations:
+    pipelines.kubeflow.org/big_data_passing_format: $(workspaces.$TASK_NAME.path)/artifacts/$ORIG_PR_NAME/$TASKRUN_NAME/$TASK_PARAM_NAME
+    pipelines.kubeflow.org/pipeline_spec: '{"inputs": [{"name": "aws_access_key",
+      "type": "String"}, {"name": "aws_secret", "type": "String"}, {"name": "oc_host",
+      "type": "String"}, {"name": "oc_token", "type": "String"}, {"default": "https://s3.us.cloud-object-storage.appdomain.cloud",
+      "name": "s3_endpoint", "optional": true, "type": "String"}, {"default": "us-geo",
+      "name": "s3_region", "optional": true, "type": "String"}, {"default": "model-trust",
+      "name": "data_bucket", "optional": true, "type": "String"}, {"default": "simulated_data/x_cal.csv",
+      "name": "calibration_data_x_path", "optional": true, "type": "String"}, {"default":
+      "simulated_data/y_cal.csv", "name": "calibration_data_y_path", "optional": true,
+      "type": "String"}, {"default": "model-trust", "name": "model_bucket", "optional":
+      true, "type": "String"}, {"default": "onnx_models/base_onnx_model.onnx", "name":
+      "base_model_path", "optional": true, "type": "String"}, {"default": "kube:admin",
+      "name": "oc_user", "optional": true, "type": "String"}, {"default": "model-trust-ds-project",
+      "name": "odh_ds_project_name", "optional": true, "type": "String"}, {"default":
+      "aws-connection-samples3", "name": "odh_data_connection_name", "optional": true,
+      "type": "String"}, {"default": "multi_region", "name": "region_type", "optional":
+      true, "type": "typing.Literal[''single_region'', ''multi_region'']"}, {"default":
+      "95", "name": "confidence", "optional": true, "type": "Integer"}, {"default":
+      "coverage_ratio", "name": "multi_region_model_selection_metric", "optional":
+      true, "type": "String"}, {"default": "min", "name": "multi_region_model_selection_stat",
+      "optional": true, "type": "String"}, {"default": "20", "name": "multi_region_min_group_size",
+      "optional": true, "type": "Integer"}], "name": "Model Trust Pipeline"}'
+    sidecar.istio.io/inject: 'false'
+    tekton.dev/artifact_bucket: mlpipeline
+    tekton.dev/artifact_endpoint: minio-service.kubeflow:9000
+    tekton.dev/artifact_endpoint_scheme: http://
+    tekton.dev/artifact_items: '{"deploy-model-trust-model": [["model_trust_service_name",
+      "$(results.model-trust-service-name.path)"]], "load-base-model": [["base_model",
+      "$(workspaces.load-base-model.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/base_model"]],
+      "load-calibration-data": [["x_cal", "$(workspaces.load-calibration-data.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/x_cal"],
+      ["y_cal", "$(workspaces.load-calibration-data.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/y_cal"]],
+      "train-model-trust-model": [["model_trust_wrapped_model_path", "$(workspaces.train-model-trust-model.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/model_trust_wrapped_model_path"]]}'
+    tekton.dev/input_artifacts: '{"deploy-model-trust-model": [{"name": "train-model-trust-model-model_trust_wrapped_model_path",
+      "parent_task": "train-model-trust-model"}], "train-model-trust-model": [{"name":
+      "load-base-model-base_model", "parent_task": "load-base-model"}, {"name": "load-calibration-data-x_cal",
+      "parent_task": "load-calibration-data"}, {"name": "load-calibration-data-y_cal",
+      "parent_task": "load-calibration-data"}]}'
+    tekton.dev/output_artifacts: '{"deploy-model-trust-model": [{"key": "artifacts/$PIPELINERUN/deploy-model-trust-model/model_trust_service_name.tgz",
+      "name": "deploy-model-trust-model-model_trust_service_name", "path": "/tmp/outputs/model_trust_service_name/data"}],
+      "load-base-model": [{"key": "artifacts/$PIPELINERUN/load-base-model/base_model.tgz",
+      "name": "load-base-model-base_model", "path": "/tmp/outputs/base_model/data"}],
+      "load-calibration-data": [{"key": "artifacts/$PIPELINERUN/load-calibration-data/x_cal.tgz",
+      "name": "load-calibration-data-x_cal", "path": "/tmp/outputs/x_cal/data"}, {"key":
+      "artifacts/$PIPELINERUN/load-calibration-data/y_cal.tgz", "name": "load-calibration-data-y_cal",
+      "path": "/tmp/outputs/y_cal/data"}], "train-model-trust-model": [{"key": "artifacts/$PIPELINERUN/train-model-trust-model/model_trust_wrapped_model_path.tgz",
+      "name": "train-model-trust-model-model_trust_wrapped_model_path", "path": "/tmp/outputs/model_trust_wrapped_model_path/data"}]}'
+    tekton.dev/template: ''
+  labels:
+    pipelines.kubeflow.org/generation: ''
+    pipelines.kubeflow.org/pipelinename: ''
+  name: model-trust-pipeline
+spec:
+  params:
+  - name: aws_access_key
+    value: ''
+  - name: aws_secret
+    value: ''
+  - name: base_model_path
+    value: onnx_models/base_onnx_model.onnx
+  - name: calibration_data_x_path
+    value: simulated_data/x_cal.csv
+  - name: calibration_data_y_path
+    value: simulated_data/y_cal.csv
+  - name: confidence
+    value: '95'
+  - name: data_bucket
+    value: model-trust
+  - name: model_bucket
+    value: model-trust
+  - name: multi_region_min_group_size
+    value: '20'
+  - name: multi_region_model_selection_metric
+    value: coverage_ratio
+  - name: multi_region_model_selection_stat
+    value: min
+  - name: oc_host
+    value: ''
+  - name: oc_token
+    value: ''
+  - name: oc_user
+    value: kube:admin
+  - name: odh_data_connection_name
+    value: aws-connection-samples3
+  - name: odh_ds_project_name
+    value: model-trust-ds-project
+  - name: region_type
+    value: multi_region
+  - name: s3_endpoint
+    value: https://s3.us.cloud-object-storage.appdomain.cloud
+  - name: s3_region
+    value: us-geo
+  pipelineSpec:
+    params:
+    - name: aws_access_key
+    - name: aws_secret
+    - default: onnx_models/base_onnx_model.onnx
+      name: base_model_path
+    - default: simulated_data/x_cal.csv
+      name: calibration_data_x_path
+    - default: simulated_data/y_cal.csv
+      name: calibration_data_y_path
+    - default: '95'
+      name: confidence
+    - default: model-trust
+      name: data_bucket
+    - default: model-trust
+      name: model_bucket
+    - default: '20'
+      name: multi_region_min_group_size
+    - default: coverage_ratio
+      name: multi_region_model_selection_metric
+    - default: min
+      name: multi_region_model_selection_stat
+    - name: oc_host
+    - name: oc_token
+    - default: kube:admin
+      name: oc_user
+    - default: aws-connection-samples3
+      name: odh_data_connection_name
+    - default: model-trust-ds-project
+      name: odh_ds_project_name
+    - default: multi_region
+      name: region_type
+    - default: https://s3.us.cloud-object-storage.appdomain.cloud
+      name: s3_endpoint
+    - default: us-geo
+      name: s3_region
+    tasks:
+    - name: load-calibration-data
+      params:
+      - name: aws_access_key
+        value: $(params.aws_access_key)
+      - name: aws_secret
+        value: $(params.aws_secret)
+      - name: calibration_data_x_path
+        value: $(params.calibration_data_x_path)
+      - name: calibration_data_y_path
+        value: $(params.calibration_data_y_path)
+      - name: data_bucket
+        value: $(params.data_bucket)
+      - name: s3_endpoint
+        value: $(params.s3_endpoint)
+      - name: s3_region
+        value: $(params.s3_region)
+      taskSpec:
+        metadata:
+          annotations:
+            pipelines.kubeflow.org/component_spec_digest: '{"name": "Load calibration
+              data", "outputs": [{"name": "x_cal"}, {"name": "y_cal"}], "version":
+              "Load calibration data@sha256=9f7f1491ce989b669682f9079179c5516afbc3a3f06bf6f76940035567d6636f"}'
+          labels:
+            pipelines.kubeflow.org/cache_enabled: 'true'
+        params:
+        - name: aws_access_key
+        - name: aws_secret
+        - name: calibration_data_x_path
+        - name: calibration_data_y_path
+        - name: data_bucket
+        - name: s3_endpoint
+        - name: s3_region
+        results:
+        - name: taskrun-name
+          type: string
+        - description: /tmp/outputs/x_cal/data
+          name: x-cal
+          type: string
+        - description: /tmp/outputs/y_cal/data
+          name: y-cal
+          type: string
+        steps:
+        - args:
+          - --x-cal
+          - $(workspaces.load-calibration-data.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/x_cal
+          - --y-cal
+          - $(workspaces.load-calibration-data.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/y_cal
+          command:
+          - sh
+          - -c
+          - (PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location
+            'boto3' 'pandas' || PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install
+            --quiet --no-warn-script-location 'boto3' 'pandas' --user) && "$0" "$@"
+          - sh
+          - -ec
+          - 'program_path=$(mktemp)
+
+            printf "%s" "$0" > "$program_path"
+
+            python3 -u "$program_path" "$@"
+
+            '
+          - "def _make_parent_dirs_and_return_path(file_path: str):\n    import os\n\
+            \    os.makedirs(os.path.dirname(file_path), exist_ok=True)\n    return\
+            \ file_path\n\ndef load_calibration_data(\n    x_cal_file,\n    y_cal_file,\n\
+            ):\n    print(\"Initializing task to download calibration data...\")\n\
+            \    # imports\n    import os\n    import boto3\n    import pickle\n \
+            \   import warnings\n    import pandas as pd\n\n    warnings.filterwarnings(\"\
+            ignore\")\n\n    aws_access_key_id = os.getenv(\"AWS_ACCESS_KEY_ID\")\n\
+            \    aws_secret_access_key = os.getenv(\"AWS_SECRET_ACCESS_KEY\")\n  \
+            \  aws_endpoint_url = os.getenv(\"AWS_ENDPOINT_URL\")\n    aws_region_name\
+            \ = os.getenv(\"AWS_REGION\")\n\n    data_bucket = os.getenv(\"DATA_BUCKET\"\
+            )  # s3 bucket with calibration data\n    calibration_data_x_path = os.getenv(\"\
+            CALIBRATION_DATA_X_PATH\")\n    calibration_data_y_path = os.getenv(\"\
+            CALIBRATION_DATA_Y_PATH\")\n\n    # s3 connection\n    session = boto3.Session(\n\
+            \        aws_access_key_id=aws_access_key_id,  # os.getenv(\"AWS_ACCESS_KEY_ID\"\
+            ),\n        aws_secret_access_key=aws_secret_access_key,  # os.getenv(\"\
+            AWS_SECRET_ACCESS_KEY\"),\n    )\n    s3_client = session.client(\n  \
+            \      \"s3\",\n        endpoint_url=aws_endpoint_url,  # os.getenv(\"\
+            AWS_ENDPOINT_URL\"),\n        region_name=aws_region_name,  # os.getenv(\"\
+            AWS_REGION\"),\n    )\n\n    x_cal = pd.read_csv(\n        s3_client.get_object(Bucket=data_bucket,\
+            \ Key=calibration_data_x_path)[\"Body\"]\n    )\n    print(\"completed\
+            \ downloading x_cal.\")\n\n    y_cal = pd.read_csv(\n        s3_client.get_object(Bucket=data_bucket,\
+            \ Key=calibration_data_y_path)[\"Body\"]\n    )\n    print(\"completed\
+            \ downloading y_cal.\")\n\n    x_cal = x_cal.values\n    y_cal = y_cal.values.flatten()\n\
+            \n    def save_pickle(object_file, target_object):\n        with open(object_file,\
+            \ \"wb\") as f:\n            pickle.dump(target_object, f)\n\n    save_pickle(x_cal_file,\
+            \ x_cal)\n    save_pickle(y_cal_file, y_cal)\n\n    print(\"Completed\
+            \ persisting calibration data.\")\n\nimport argparse\n_parser = argparse.ArgumentParser(prog='Load\
+            \ calibration data', description='')\n_parser.add_argument(\"--x-cal\"\
+            , dest=\"x_cal_file\", type=_make_parent_dirs_and_return_path, required=True,\
+            \ default=argparse.SUPPRESS)\n_parser.add_argument(\"--y-cal\", dest=\"\
+            y_cal_file\", type=_make_parent_dirs_and_return_path, required=True, default=argparse.SUPPRESS)\n\
+            _parsed_args = vars(_parser.parse_args())\n\n_outputs = load_calibration_data(**_parsed_args)\n"
+          env:
+          - name: AWS_ACCESS_KEY_ID
+            value: $(inputs.params.aws_access_key)
+          - name: AWS_SECRET_ACCESS_KEY
+            value: $(inputs.params.aws_secret)
+          - name: AWS_ENDPOINT_URL
+            value: $(inputs.params.s3_endpoint)
+          - name: AWS_REGION
+            value: $(inputs.params.s3_region)
+          - name: DATA_BUCKET
+            value: $(inputs.params.data_bucket)
+          - name: CALIBRATION_DATA_X_PATH
+            value: $(inputs.params.calibration_data_x_path)
+          - name: CALIBRATION_DATA_Y_PATH
+            value: $(inputs.params.calibration_data_y_path)
+          - name: ORIG_PR_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['custom.tekton.dev/originalPipelineRun']
+          image: registry.access.redhat.com/ubi8/python-39
+          name: main
+          resources:
+            limits:
+              cpu: '2'
+              memory: 2G
+            requests:
+              cpu: '1'
+              memory: 1G
+        - command:
+          - sh
+          - -ec
+          - echo -n "$(context.taskRun.name)" > "$(results.taskrun-name.path)"
+          image: docker-na.artifactory.swg-devops.com/res-srom-docker-remote/busybox
+          name: output-taskrun-name
+        - command:
+          - sh
+          - -ec
+          - "set -exo pipefail\nTOTAL_SIZE=0\ncopy_artifact() {\nif [ -d \"$1\" ];\
+            \ then\n  tar -czvf \"$1\".tar.gz \"$1\"\n  SUFFIX=\".tar.gz\"\nfi\nARTIFACT_SIZE=`wc\
+            \ -c \"$1\"${SUFFIX} | awk '{print $1}'`\nTOTAL_SIZE=$( expr $TOTAL_SIZE\
+            \ + $ARTIFACT_SIZE)\ntouch \"$2\"\nif [[ $TOTAL_SIZE -lt 3072 ]]; then\n\
+            \  if [ -d \"$1\" ]; then\n    tar -tzf \"$1\".tar.gz > \"$2\"\n  elif\
+            \ ! awk \"/[^[:print:]]/{f=1} END{exit !f}\" \"$1\"; then\n    cp \"$1\"\
+            \ \"$2\"\n  fi\nfi\n}\ncopy_artifact $(workspaces.load-calibration-data.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/x_cal\
+            \ $(results.x-cal.path)\ncopy_artifact $(workspaces.load-calibration-data.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/y_cal\
+            \ $(results.y-cal.path)\n"
+          env:
+          - name: ORIG_PR_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['custom.tekton.dev/originalPipelineRun']
+          image: docker-na.artifactory.swg-devops.com/res-srom-docker-remote/busybox
+          name: copy-results-artifacts
+          onError: continue
+        workspaces:
+        - name: load-calibration-data
+      workspaces:
+      - name: load-calibration-data
+        workspace: model-trust-pipeline
+    - name: load-base-model
+      params:
+      - name: aws_access_key
+        value: $(params.aws_access_key)
+      - name: aws_secret
+        value: $(params.aws_secret)
+      - name: base_model_path
+        value: $(params.base_model_path)
+      - name: model_bucket
+        value: $(params.model_bucket)
+      - name: s3_endpoint
+        value: $(params.s3_endpoint)
+      - name: s3_region
+        value: $(params.s3_region)
+      taskSpec:
+        metadata:
+          annotations:
+            pipelines.kubeflow.org/component_spec_digest: '{"name": "Load base model",
+              "outputs": [{"name": "base_model"}], "version": "Load base model@sha256=de4e1d2f22700fb9de682881c1c37a6348f850675c55ffb2522b75b9a713ad9b"}'
+          labels:
+            pipelines.kubeflow.org/cache_enabled: 'true'
+        params:
+        - name: aws_access_key
+        - name: aws_secret
+        - name: base_model_path
+        - name: model_bucket
+        - name: s3_endpoint
+        - name: s3_region
+        results:
+        - description: /tmp/outputs/base_model/data
+          name: base-model
+          type: string
+        - name: taskrun-name
+          type: string
+        steps:
+        - args:
+          - --base-model
+          - $(workspaces.load-base-model.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/base_model
+          command:
+          - sh
+          - -c
+          - (PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location
+            'boto3' 'pandas' || PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install
+            --quiet --no-warn-script-location 'boto3' 'pandas' --user) && "$0" "$@"
+          - sh
+          - -ec
+          - 'program_path=$(mktemp)
+
+            printf "%s" "$0" > "$program_path"
+
+            python3 -u "$program_path" "$@"
+
+            '
+          - "def _make_parent_dirs_and_return_path(file_path: str):\n    import os\n\
+            \    os.makedirs(os.path.dirname(file_path), exist_ok=True)\n    return\
+            \ file_path\n\ndef load_base_model(\n    base_model_file,\n):\n    print(\"\
+            Initializing task to download base model...\")\n    # imports\n    import\
+            \ os\n    import boto3\n    import pickle\n    import warnings\n\n   \
+            \ warnings.filterwarnings(\"ignore\")\n\n    aws_access_key_id = os.getenv(\"\
+            AWS_ACCESS_KEY_ID\")\n    aws_secret_access_key = os.getenv(\"AWS_SECRET_ACCESS_KEY\"\
+            )\n    aws_endpoint_url = os.getenv(\"AWS_ENDPOINT_URL\")\n    aws_region_name\
+            \ = os.getenv(\"AWS_REGION\")\n\n    model_bucket = os.getenv(\"MODEL_BUCKET\"\
+            )  # s3 bucket with calibration data\n    base_model_path = os.getenv(\"\
+            BASE_MODEL_PATH\")\n\n    # s3 connection\n    session = boto3.Session(\n\
+            \        aws_access_key_id=aws_access_key_id,  # os.getenv(\"AWS_ACCESS_KEY_ID\"\
+            ),\n        aws_secret_access_key=aws_secret_access_key,  # os.getenv(\"\
+            AWS_SECRET_ACCESS_KEY\"),\n    )\n    s3_client = session.client(\n  \
+            \      \"s3\",\n        endpoint_url=aws_endpoint_url,  # os.getenv(\"\
+            AWS_ENDPOINT_URL\"),\n        region_name=aws_region_name,  # os.getenv(\"\
+            AWS_REGION\"),\n    )\n\n    base_onnx_model_str = s3_client.get_object(\n\
+            \        Bucket=model_bucket, Key=base_model_path\n    )[\"Body\"].read()\n\
+            \n    print(\"completed downloading base model.\")\n\n    def save_pickle(object_file,\
+            \ target_object):\n        with open(object_file, \"wb\") as f:\n    \
+            \        pickle.dump(target_object, f)\n\n    save_pickle(base_model_file,\
+            \ base_onnx_model_str)\n    print(\"Completed persisting base model.\"\
+            )\n\nimport argparse\n_parser = argparse.ArgumentParser(prog='Load base\
+            \ model', description='')\n_parser.add_argument(\"--base-model\", dest=\"\
+            base_model_file\", type=_make_parent_dirs_and_return_path, required=True,\
+            \ default=argparse.SUPPRESS)\n_parsed_args = vars(_parser.parse_args())\n\
+            \n_outputs = load_base_model(**_parsed_args)\n"
+          env:
+          - name: AWS_ACCESS_KEY_ID
+            value: $(inputs.params.aws_access_key)
+          - name: AWS_SECRET_ACCESS_KEY
+            value: $(inputs.params.aws_secret)
+          - name: AWS_ENDPOINT_URL
+            value: $(inputs.params.s3_endpoint)
+          - name: AWS_REGION
+            value: $(inputs.params.s3_region)
+          - name: MODEL_BUCKET
+            value: $(inputs.params.model_bucket)
+          - name: BASE_MODEL_PATH
+            value: $(inputs.params.base_model_path)
+          - name: ORIG_PR_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['custom.tekton.dev/originalPipelineRun']
+          image: registry.access.redhat.com/ubi8/python-39
+          name: main
+          resources:
+            limits:
+              cpu: '2'
+              memory: 2G
+            requests:
+              cpu: '1'
+              memory: 1G
+        - command:
+          - sh
+          - -ec
+          - echo -n "$(context.taskRun.name)" > "$(results.taskrun-name.path)"
+          image: docker-na.artifactory.swg-devops.com/res-srom-docker-remote/busybox
+          name: output-taskrun-name
+        - command:
+          - sh
+          - -ec
+          - "set -exo pipefail\nTOTAL_SIZE=0\ncopy_artifact() {\nif [ -d \"$1\" ];\
+            \ then\n  tar -czvf \"$1\".tar.gz \"$1\"\n  SUFFIX=\".tar.gz\"\nfi\nARTIFACT_SIZE=`wc\
+            \ -c \"$1\"${SUFFIX} | awk '{print $1}'`\nTOTAL_SIZE=$( expr $TOTAL_SIZE\
+            \ + $ARTIFACT_SIZE)\ntouch \"$2\"\nif [[ $TOTAL_SIZE -lt 3072 ]]; then\n\
+            \  if [ -d \"$1\" ]; then\n    tar -tzf \"$1\".tar.gz > \"$2\"\n  elif\
+            \ ! awk \"/[^[:print:]]/{f=1} END{exit !f}\" \"$1\"; then\n    cp \"$1\"\
+            \ \"$2\"\n  fi\nfi\n}\ncopy_artifact $(workspaces.load-base-model.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/base_model\
+            \ $(results.base-model.path)\n"
+          env:
+          - name: ORIG_PR_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['custom.tekton.dev/originalPipelineRun']
+          image: docker-na.artifactory.swg-devops.com/res-srom-docker-remote/busybox
+          name: copy-results-artifacts
+          onError: continue
+        workspaces:
+        - name: load-base-model
+      workspaces:
+      - name: load-base-model
+        workspace: model-trust-pipeline
+    - name: train-model-trust-model
+      params:
+      - name: aws_access_key
+        value: $(params.aws_access_key)
+      - name: aws_secret
+        value: $(params.aws_secret)
+      - name: confidence
+        value: $(params.confidence)
+      - name: model_bucket
+        value: $(params.model_bucket)
+      - name: multi_region_min_group_size
+        value: $(params.multi_region_min_group_size)
+      - name: multi_region_model_selection_metric
+        value: $(params.multi_region_model_selection_metric)
+      - name: multi_region_model_selection_stat
+        value: $(params.multi_region_model_selection_stat)
+      - name: region_type
+        value: $(params.region_type)
+      - name: s3_endpoint
+        value: $(params.s3_endpoint)
+      - name: s3_region
+        value: $(params.s3_region)
+      - name: load-base-model-trname
+        value: $(tasks.load-base-model.results.taskrun-name)
+      - name: load-calibration-data-trname
+        value: $(tasks.load-calibration-data.results.taskrun-name)
+      runAfter:
+      - load-base-model
+      - load-calibration-data
+      - load-calibration-data
+      taskSpec:
+        metadata:
+          annotations:
+            pipelines.kubeflow.org/component_spec_digest: '{"name": "Train model trust
+              model", "outputs": [{"name": "model_trust_wrapped_model_path"}], "version":
+              "Train model trust model@sha256=6af295a28ae4db9d165982e8a168dc14133be35ebd45f51806d60e7cf06fc037"}'
+          labels:
+            pipelines.kubeflow.org/cache_enabled: 'true'
+        params:
+        - name: aws_access_key
+        - name: aws_secret
+        - name: confidence
+        - name: model_bucket
+        - name: multi_region_min_group_size
+        - name: multi_region_model_selection_metric
+        - name: multi_region_model_selection_stat
+        - name: region_type
+        - name: s3_endpoint
+        - name: s3_region
+        - name: load-base-model-trname
+        - name: load-calibration-data-trname
+        results:
+        - description: /tmp/outputs/model_trust_wrapped_model_path/data
+          name: model-trust-wrapped-model-path
+          type: string
+        - name: taskrun-name
+          type: string
+        steps:
+        - args:
+          - --x-cal
+          - $(workspaces.train-model-trust-model.path)/artifacts/$ORIG_PR_NAME/$(params.load-calibration-data-trname)/x_cal
+          - --y-cal
+          - $(workspaces.train-model-trust-model.path)/artifacts/$ORIG_PR_NAME/$(params.load-calibration-data-trname)/y_cal
+          - --base-model
+          - $(workspaces.train-model-trust-model.path)/artifacts/$ORIG_PR_NAME/$(params.load-base-model-trname)/base_model
+          - --model-trust-wrapped-model-path
+          - $(workspaces.train-model-trust-model.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/model_trust_wrapped_model_path
+          command:
+          - sh
+          - -c
+          - (PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location
+            'boto3' 'pandas' 'model_trust @ git+https://github.com/trustyai-explainability/trustyai-model-trust.git'
+            || PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location
+            'boto3' 'pandas' 'model_trust @ git+https://github.com/trustyai-explainability/trustyai-model-trust.git'
+            --user) && "$0" "$@"
+          - sh
+          - -ec
+          - 'program_path=$(mktemp)
+
+            printf "%s" "$0" > "$program_path"
+
+            python3 -u "$program_path" "$@"
+
+            '
+          - "def _parent_dirs_maker_that_returns_open_file(mode: str, encoding: str\
+            \ = None):\n\n    def make_parent_dirs_and_return_path(file_path: str):\n\
+            \        import os\n        os.makedirs(os.path.dirname(file_path), exist_ok=True)\n\
+            \        return open(file_path, mode=mode, encoding=encoding)\n\n    return\
+            \ make_parent_dirs_and_return_path\n\ndef train_model_trust_model(\n \
+            \   x_cal_file,\n    y_cal_file,\n    base_model_file,\n    model_trust_wrapped_model_path_file,\n\
+            ):\n    print(\"Initializing task to train model trust model...\")\n\n\
+            \    # imports\n    import os\n    import random\n    import string\n\
+            \    import boto3\n    import pickle\n    import warnings\n    from model_trust.regression.region_uncertainty_estimation\
+            \ import (\n        RegionUncertaintyEstimator,\n    )\n\n    warnings.filterwarnings(\"\
+            ignore\")\n\n    aws_access_key_id = os.getenv(\"AWS_ACCESS_KEY_ID\")\n\
+            \    aws_secret_access_key = os.getenv(\"AWS_SECRET_ACCESS_KEY\")\n  \
+            \  aws_endpoint_url = os.getenv(\"AWS_ENDPOINT_URL\")\n    aws_region_name\
+            \ = os.getenv(\"AWS_REGION\")\n\n    model_bucket = os.getenv(\"MODEL_BUCKET\"\
+            )  # s3 bucket with calibration data\n\n    # model trust parameters\n\
+            \    model_trust_params = {}\n    model_trust_params[\"regions_model\"\
+            ] = os.getenv(\"REGION_TYPE\")\n    model_trust_params[\"confidence\"\
+            ] = int(os.getenv(\"CONFIDENCE\"))\n\n    if model_trust_params[\"regions_model\"\
+            ] not in [\"single_region\", \"multi_region\"]:\n        raise Exception(\n\
+            \            \"Model Trust region model type {} is not supported. Use\
+            \ 'single_region' or 'multi_region'.\".format(\n                model_trust_params[\"\
+            regions_model\"]\n            )\n        )\n\n    if model_trust_params[\"\
+            regions_model\"] == \"multi_region\":\n        model_trust_params[\"multi_region_model_selection_metric\"\
+            ] = os.getenv(\n            \"MULTI_REGION_MODEL_SELECTION_METRIC\"\n\
+            \        )\n        model_trust_params[\"multi_region_model_selection_stat\"\
+            ] = os.getenv(\n            \"MULTI_REGION_MODEL_SELECTION_STAT\"\n  \
+            \      )\n        model_trust_params[\"multi_region_min_group_size\"]\
+            \ = int(\n            os.getenv(\"MULTI_REGION_MIN_GROUP_SIZE\")\n   \
+            \     )\n\n    def load_pickle(object_file):\n        with open(object_file,\
+            \ \"rb\") as f:\n            target_object = pickle.load(f)\n        return\
+            \ target_object\n\n    x_cal = load_pickle(x_cal_file)\n    y_cal = load_pickle(y_cal_file)\n\
+            \    print(\"loaded calibration data.\")\n\n    base_onnx_model_str =\
+            \ load_pickle(base_model_file)\n    print(\"loaded base model.\")\n\n\
+            \    model_trust_params[\"base_model\"] = base_onnx_model_str\n\n    multi_region_cp_model\
+            \ = RegionUncertaintyEstimator(**model_trust_params)\n    print(\"initialized\
+            \ Region Uncertainty Estimator.\")\n\n    multi_region_cp_model.fit(x_cal,\
+            \ y_cal)\n    print(\"trained Region Uncertainty Estimator.\")\n\n   \
+            \ model_trust_wrapped_model = multi_region_cp_model.export_learned_config()[\n\
+            \        \"combined_model\"\n    ]\n    print(\"retrieved wrapped model\
+            \ trust model.\")\n\n    # s3 connection\n    session = boto3.Session(\n\
+            \        aws_access_key_id=aws_access_key_id,  # os.getenv(\"AWS_ACCESS_KEY_ID\"\
+            ),\n        aws_secret_access_key=aws_secret_access_key,  # os.getenv(\"\
+            AWS_SECRET_ACCESS_KEY\"),\n    )\n    s3_client = session.client(\n  \
+            \      \"s3\",\n        endpoint_url=aws_endpoint_url,  # os.getenv(\"\
+            AWS_ENDPOINT_URL\"),\n        region_name=aws_region_name,  # os.getenv(\"\
+            AWS_REGION\"),\n    )\n\n    # s3 path for model trust model\n    model_trust_wrapped_model_path\
+            \ = (\n        \"onnx_models/{}_model_trust_ds_model_{}.onnx\".format(\n\
+            \            model_trust_params[\"regions_model\"],\n            \"\"\
+            .join(random.choices(string.ascii_lowercase + string.digits, k=5)),\n\
+            \        )\n    )\n    s3_client.put_object(\n        Body=model_trust_wrapped_model,\n\
+            \        Bucket=model_bucket,\n        Key=model_trust_wrapped_model_path,\n\
+            \    )\n    model_trust_wrapped_model_path_file.write(model_trust_wrapped_model_path)\n\
+            \    print(\"Completed uploading model trust model to s3.\")\n\nimport\
+            \ argparse\n_parser = argparse.ArgumentParser(prog='Train model trust\
+            \ model', description='')\n_parser.add_argument(\"--x-cal\", dest=\"x_cal_file\"\
+            , type=str, required=True, default=argparse.SUPPRESS)\n_parser.add_argument(\"\
+            --y-cal\", dest=\"y_cal_file\", type=str, required=True, default=argparse.SUPPRESS)\n\
+            _parser.add_argument(\"--base-model\", dest=\"base_model_file\", type=str,\
+            \ required=True, default=argparse.SUPPRESS)\n_parser.add_argument(\"--model-trust-wrapped-model-path\"\
+            , dest=\"model_trust_wrapped_model_path_file\", type=_parent_dirs_maker_that_returns_open_file('wt'),\
+            \ required=True, default=argparse.SUPPRESS)\n_parsed_args = vars(_parser.parse_args())\n\
+            \n_outputs = train_model_trust_model(**_parsed_args)\n"
+          env:
+          - name: AWS_ACCESS_KEY_ID
+            value: $(inputs.params.aws_access_key)
+          - name: AWS_SECRET_ACCESS_KEY
+            value: $(inputs.params.aws_secret)
+          - name: AWS_ENDPOINT_URL
+            value: $(inputs.params.s3_endpoint)
+          - name: AWS_REGION
+            value: $(inputs.params.s3_region)
+          - name: MODEL_BUCKET
+            value: $(inputs.params.model_bucket)
+          - name: REGION_TYPE
+            value: $(inputs.params.region_type)
+          - name: CONFIDENCE
+            value: $(inputs.params.confidence)
+          - name: MULTI_REGION_MODEL_SELECTION_METRIC
+            value: $(inputs.params.multi_region_model_selection_metric)
+          - name: MULTI_REGION_MODEL_SELECTION_STAT
+            value: $(inputs.params.multi_region_model_selection_stat)
+          - name: MULTI_REGION_MIN_GROUP_SIZE
+            value: $(inputs.params.multi_region_min_group_size)
+          - name: ORIG_PR_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['custom.tekton.dev/originalPipelineRun']
+          image: registry.access.redhat.com/ubi8/python-39
+          name: main
+          resources:
+            limits:
+              cpu: '2'
+              memory: 4G
+            requests:
+              cpu: '1'
+              memory: 2G
+        - command:
+          - sh
+          - -ec
+          - echo -n "$(context.taskRun.name)" > "$(results.taskrun-name.path)"
+          image: docker-na.artifactory.swg-devops.com/res-srom-docker-remote/busybox
+          name: output-taskrun-name
+        - command:
+          - sh
+          - -ec
+          - "set -exo pipefail\nTOTAL_SIZE=0\ncopy_artifact() {\nif [ -d \"$1\" ];\
+            \ then\n  tar -czvf \"$1\".tar.gz \"$1\"\n  SUFFIX=\".tar.gz\"\nfi\nARTIFACT_SIZE=`wc\
+            \ -c \"$1\"${SUFFIX} | awk '{print $1}'`\nTOTAL_SIZE=$( expr $TOTAL_SIZE\
+            \ + $ARTIFACT_SIZE)\ntouch \"$2\"\nif [[ $TOTAL_SIZE -lt 3072 ]]; then\n\
+            \  if [ -d \"$1\" ]; then\n    tar -tzf \"$1\".tar.gz > \"$2\"\n  elif\
+            \ ! awk \"/[^[:print:]]/{f=1} END{exit !f}\" \"$1\"; then\n    cp \"$1\"\
+            \ \"$2\"\n  fi\nfi\n}\ncopy_artifact $(workspaces.train-model-trust-model.path)/artifacts/$ORIG_PR_NAME/$(context.taskRun.name)/model_trust_wrapped_model_path\
+            \ $(results.model-trust-wrapped-model-path.path)\n"
+          env:
+          - name: ORIG_PR_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['custom.tekton.dev/originalPipelineRun']
+          image: docker-na.artifactory.swg-devops.com/res-srom-docker-remote/busybox
+          name: copy-results-artifacts
+          onError: continue
+        workspaces:
+        - name: train-model-trust-model
+      workspaces:
+      - name: train-model-trust-model
+        workspace: model-trust-pipeline
+    - name: deploy-model-trust-model
+      params:
+      - name: oc_host
+        value: $(params.oc_host)
+      - name: oc_token
+        value: $(params.oc_token)
+      - name: oc_user
+        value: $(params.oc_user)
+      - name: odh_data_connection_name
+        value: $(params.odh_data_connection_name)
+      - name: odh_ds_project_name
+        value: $(params.odh_ds_project_name)
+      - name: train-model-trust-model-trname
+        value: $(tasks.train-model-trust-model.results.taskrun-name)
+      runAfter:
+      - train-model-trust-model
+      taskSpec:
+        metadata:
+          annotations:
+            pipelines.kubeflow.org/component_spec_digest: '{"name": "Deploy model
+              trust model", "outputs": [{"name": "model_trust_service_name"}], "version":
+              "Deploy model trust model@sha256=513e3ee93cee1f5f793b9ba615410fe62473726914a19be445b595847e6d8c86"}'
+          labels:
+            pipelines.kubeflow.org/cache_enabled: 'true'
+        params:
+        - name: oc_host
+        - name: oc_token
+        - name: oc_user
+        - name: odh_data_connection_name
+        - name: odh_ds_project_name
+        - name: train-model-trust-model-trname
+        results:
+        - description: /tmp/outputs/model_trust_service_name/data
+          name: model-trust-service-name
+          type: string
+        steps:
+        - args:
+          - --model-trust-wrapped-model-path
+          - $(workspaces.deploy-model-trust-model.path)/artifacts/$ORIG_PR_NAME/$(params.train-model-trust-model-trname)/model_trust_wrapped_model_path
+          - --model-trust-service-name
+          - $(results.model-trust-service-name.path)
+          command:
+          - sh
+          - -c
+          - (PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet --no-warn-script-location
+            'boto3' 'kserve' || PIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install
+            --quiet --no-warn-script-location 'boto3' 'kserve' --user) && "$0" "$@"
+          - sh
+          - -ec
+          - 'program_path=$(mktemp)
+
+            printf "%s" "$0" > "$program_path"
+
+            python3 -u "$program_path" "$@"
+
+            '
+          - "def _parent_dirs_maker_that_returns_open_file(mode: str, encoding: str\
+            \ = None):\n\n    def make_parent_dirs_and_return_path(file_path: str):\n\
+            \        import os\n        os.makedirs(os.path.dirname(file_path), exist_ok=True)\n\
+            \        return open(file_path, mode=mode, encoding=encoding)\n\n    return\
+            \ make_parent_dirs_and_return_path\n\ndef deploy_model_trust_model(\n\
+            \    model_trust_wrapped_model_path_file,\n    model_trust_service_name_file,\n\
+            ):\n    print(\"Initializing task to deploy model trust model...\")\n\n\
+            \    # imports\n    import os\n    import warnings\n    from kubernetes\
+            \ import client\n    from kserve import KServeClient\n    from kserve\
+            \ import constants\n    from kserve import V1beta1PredictorSpec, V1beta1Batcher\n\
+            \    from kserve import V1beta1ModelSpec, V1beta1ModelFormat\n    from\
+            \ kserve import V1beta1StorageSpec\n    from kserve import V1beta1InferenceServiceSpec\n\
+            \    from kserve import V1beta1InferenceService\n\n    warnings.filterwarnings(\"\
+            ignore\")\n\n    model_trust_wrapped_model_path = model_trust_wrapped_model_path_file.readline()\n\
+            \    service_name = model_trust_wrapped_model_path.split(\"/\")[-1].split(\"\
+            .onnx\")[0]\n    service_name = service_name.replace(\"_\", \"-\")\n\n\
+            \    oc_project_name = os.getenv(\"ODH_DATA_SCIENCE_PROJECT\")\n    s3_resource_name\
+            \ = os.getenv(\"ODH_DATA_CONNECTION_NAME\")\n    oc_host = os.getenv(\"\
+            OC_HOST\")\n    oc_user = os.getenv(\"OC_USER\")\n    oc_token = os.getenv(\"\
+            OC_TOKEN\")\n\n    def _prepare_kube_config(oc_host, oc_user, oc_token,\
+            \ oc_project):\n        kube_config_dict = {\n            \"kind\": \"\
+            Config\",\n            \"apiVersion\": \"v1\",\n            \"preferences\"\
+            : {},\n            \"clusters\": [\n                {\n              \
+            \      \"cluster\": {\"insecure-skip-tls-verify\": True, \"server\": \"\
+            \"},\n                    \"name\": \"\",\n                }\n       \
+            \     ],\n            \"users\": [{\"name\": \"\", \"user\": {\"token\"\
+            : \"\"}}],\n            \"contexts\": [\n                {\"name\": \"\
+            \", \"context\": {\"cluster\": \"\", \"namespace\": \"\", \"user\": \"\
+            \"}}\n            ],\n            \"current-context\": \"\",\n       \
+            \ }\n\n        kube_config_dict[\"clusters\"][0][\"cluster\"][\"server\"\
+            ] = oc_host\n        kube_config_dict[\"clusters\"][0][\"name\"] = oc_host.split(\"\
+            https://\")[-1]\n\n        kube_config_dict[\"users\"][0][\"name\"] =\
+            \ (\n            oc_user + \"/\" + kube_config_dict[\"clusters\"][0][\"\
+            name\"]\n        )\n        kube_config_dict[\"users\"][0][\"user\"][\"\
+            token\"] = oc_token\n\n        kube_config_dict[\"contexts\"][0][\"name\"\
+            ] = (\n            oc_project + \"/\" + kube_config_dict[\"clusters\"\
+            ][0][\"name\"] + \"/\" + oc_user\n        )\n        kube_config_dict[\"\
+            contexts\"][0][\"context\"][\"cluster\"] = kube_config_dict[\n       \
+            \     \"clusters\"\n        ][0][\"name\"]\n        kube_config_dict[\"\
+            contexts\"][0][\"context\"][\"namespace\"] = oc_project\n        kube_config_dict[\"\
+            contexts\"][0][\"context\"][\"user\"] = kube_config_dict[\"users\"][\n\
+            \            0\n        ][\"name\"]\n\n        kube_config_dict[\"current-context\"\
+            ] = kube_config_dict[\"contexts\"][0][\"name\"]\n        return kube_config_dict\n\
+            \n    kube_config_dict = _prepare_kube_config(\n        oc_host, oc_user=oc_user,\
+            \ oc_token=oc_token, oc_project=oc_project_name\n    )\n\n    default_model_spec\
+            \ = V1beta1InferenceServiceSpec(\n        predictor=V1beta1PredictorSpec(\n\
+            \            model=V1beta1ModelSpec(\n                model_format=V1beta1ModelFormat(name=\"\
+            onnx\"),\n                runtime=\"triton-2.x\",\n                storage=V1beta1StorageSpec(\n\
+            \                    key=s3_resource_name, path=model_trust_wrapped_model_path\n\
+            \                ),\n            ),\n            batcher=V1beta1Batcher(max_batch_size=100),\n\
+            \        )\n    )\n\n    isvc = V1beta1InferenceService(\n        api_version=constants.KSERVE_V1BETA1,\n\
+            \        kind=constants.KSERVE_KIND,\n        metadata=client.V1ObjectMeta(\n\
+            \            name=service_name,\n            namespace=oc_project_name,\n\
+            \            annotations={\"serving.kserve.io/deploymentMode\": \"ModelMesh\"\
+            },\n        ),\n        spec=default_model_spec,\n    )\n\n    kserve_client\
+            \ = KServeClient(config_dict=kube_config_dict)\n\n    # create inference\
+            \ service\n    kserve_client.create(isvc)\n    model_trust_service_name_file.write(service_name)\n\
+            \    print(\n        \"Completed deploying model trust model {} on Model\
+            \ Mesh...\".format(service_name)\n    )\n\nimport argparse\n_parser =\
+            \ argparse.ArgumentParser(prog='Deploy model trust model', description='')\n\
+            _parser.add_argument(\"--model-trust-wrapped-model-path\", dest=\"model_trust_wrapped_model_path_file\"\
+            , type=argparse.FileType('rt'), required=True, default=argparse.SUPPRESS)\n\
+            _parser.add_argument(\"--model-trust-service-name\", dest=\"model_trust_service_name_file\"\
+            , type=_parent_dirs_maker_that_returns_open_file('wt'), required=True,\
+            \ default=argparse.SUPPRESS)\n_parsed_args = vars(_parser.parse_args())\n\
+            \n_outputs = deploy_model_trust_model(**_parsed_args)\n"
+          env:
+          - name: ODH_DATA_SCIENCE_PROJECT
+            value: $(inputs.params.odh_ds_project_name)
+          - name: ODH_DATA_CONNECTION_NAME
+            value: $(inputs.params.odh_data_connection_name)
+          - name: OC_HOST
+            value: $(inputs.params.oc_host)
+          - name: OC_USER
+            value: $(inputs.params.oc_user)
+          - name: OC_TOKEN
+            value: $(inputs.params.oc_token)
+          - name: ORIG_PR_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.labels['custom.tekton.dev/originalPipelineRun']
+          image: registry.access.redhat.com/ubi8/python-39
+          name: main
+        workspaces:
+        - name: deploy-model-trust-model
+      workspaces:
+      - name: deploy-model-trust-model
+        workspace: model-trust-pipeline
+    workspaces:
+    - name: model-trust-pipeline
+  serviceAccountName: model-trust-workbench
+  workspaces:
+  - name: model-trust-pipeline
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
