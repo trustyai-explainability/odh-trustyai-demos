@@ -1,0 +1,11 @@
+data/raw/*
+data/generated/*
+notebooks/.ipynb_checkpoints/
+/.venv/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+/.pytest_cache/
+*.results.json
+*.response.json
+*.log

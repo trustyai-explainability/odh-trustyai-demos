@@ -1,0 +1,55 @@
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: image-mmd-model
+  annotations:
+    openshift.io/display-name: image-mmd-model
+    security.opendatahub.io/enable-auth: "true"
+    serving.knative.openshift.io/enablePassthrough: "true"
+    sidecar.istio.io/inject: "true"
+    sidecar.istio.io/rewriteAppHTTPProbers: "true"
+  labels:
+    networking.kserve.io/visibility: exposed
+spec:
+  predictor:
+    minReplicas: 1
+    maxReplicas: 1
+    serviceAccountName: default
+    containers:
+      - name: kserve-container
+        image: IMAGE_PLACEHOLDER
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        env:
+          - name: MODEL_NAME
+            value: image-mmd-model
+          - name: PORT
+            value: "8080"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        readinessProbe:
+          httpGet:
+            path: /v2/health/ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /v2/health/live
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10

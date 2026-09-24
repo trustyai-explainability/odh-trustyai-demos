@@ -1,0 +1,791 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "name": "MIT Multi-Illumination",
+    "homepage": "https://projects.csail.mit.edu/illumination/",
+    "license": {
+      "name": "CC BY",
+      "notice": "All data licensed under CC-BY.",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "citation": "Lukas Murmann, Michael Gharbi, Miika Aittala, and Fredo Durand. A Multi-Illumination Dataset of Indoor Object Appearance. 2019 IEEE International Conference on Computer Vision (ICCV), October 2019.",
+    "paper_url": "https://arxiv.org/abs/1910.08131"
+  },
+  "source": {
+    "kind": "zip",
+    "url": "https://data.csail.mit.edu/multilum/multi_illumination_test_mip2_jpg.zip",
+    "filename": "multi_illumination_test_mip2_jpg.zip",
+    "sha256": "7a142f0f4dcf8c6b038f91a32eee5962a12aa68e5c4ee43adf0d3059ea0f0ce0"
+  },
+  "sample_size": 30,
+  "cases": {
+    "identical": {
+      "description": "same image bytes; deterministic no-drift sanity check",
+      "expected_drift": false
+    },
+    "near": {
+      "description": "adjacent illumination condition; expected low-change case",
+      "expected_drift": false
+    },
+    "mild": {
+      "description": "medium illumination shift; sensitivity observation",
+      "expected_drift": "observe"
+    },
+    "strong": {
+      "description": "large illumination shift; expected drift case",
+      "expected_drift": true
+    }
+  },
+  "samples": [
+    {
+      "id": "everett_dining1",
+      "reference": {
+        "member": "everett_dining1/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_dining1/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_dining1/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_dining1/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_dining1/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_dining2",
+      "reference": {
+        "member": "everett_dining2/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_dining2/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_dining2/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_dining2/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_dining2/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen2",
+      "reference": {
+        "member": "everett_kitchen2/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen2/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen2/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen2/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen2/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen4",
+      "reference": {
+        "member": "everett_kitchen4/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen4/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen4/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen4/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen4/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen5",
+      "reference": {
+        "member": "everett_kitchen5/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen5/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen5/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen5/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen5/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen6",
+      "reference": {
+        "member": "everett_kitchen6/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen6/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen6/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen6/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen6/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen7",
+      "reference": {
+        "member": "everett_kitchen7/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen7/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen7/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen7/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen7/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen8",
+      "reference": {
+        "member": "everett_kitchen8/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen8/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen8/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen8/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen8/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen9",
+      "reference": {
+        "member": "everett_kitchen9/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen9/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen9/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen9/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen9/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen12",
+      "reference": {
+        "member": "everett_kitchen12/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen12/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen12/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen12/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen12/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen14",
+      "reference": {
+        "member": "everett_kitchen14/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen14/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen14/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen14/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen14/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen17",
+      "reference": {
+        "member": "everett_kitchen17/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen17/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen17/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen17/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen17/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_kitchen18",
+      "reference": {
+        "member": "everett_kitchen18/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_kitchen18/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_kitchen18/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_kitchen18/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_kitchen18/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_living2",
+      "reference": {
+        "member": "everett_living2/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_living2/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_living2/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_living2/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_living2/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_living4",
+      "reference": {
+        "member": "everett_living4/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_living4/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_living4/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_living4/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_living4/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby1",
+      "reference": {
+        "member": "everett_lobby1/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby1/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby1/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby1/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby1/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby2",
+      "reference": {
+        "member": "everett_lobby2/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby2/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby2/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby2/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby2/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby3",
+      "reference": {
+        "member": "everett_lobby3/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby3/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby3/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby3/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby3/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby4",
+      "reference": {
+        "member": "everett_lobby4/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby4/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby4/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby4/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby4/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby6",
+      "reference": {
+        "member": "everett_lobby6/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby6/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby6/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby6/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby6/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby11",
+      "reference": {
+        "member": "everett_lobby11/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby11/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby11/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby11/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby11/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby12",
+      "reference": {
+        "member": "everett_lobby12/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby12/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby12/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby12/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby12/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby13",
+      "reference": {
+        "member": "everett_lobby13/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby13/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby13/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby13/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby13/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby14",
+      "reference": {
+        "member": "everett_lobby14/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby14/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby14/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby14/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby14/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby15",
+      "reference": {
+        "member": "everett_lobby15/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby15/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby15/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby15/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby15/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby16",
+      "reference": {
+        "member": "everett_lobby16/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby16/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby16/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby16/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby16/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby17",
+      "reference": {
+        "member": "everett_lobby17/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby17/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby17/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby17/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby17/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby18",
+      "reference": {
+        "member": "everett_lobby18/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby18/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby18/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby18/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby18/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby19",
+      "reference": {
+        "member": "everett_lobby19/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby19/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby19/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby19/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby19/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    },
+    {
+      "id": "everett_lobby20",
+      "reference": {
+        "member": "everett_lobby20/dir_0_mip2.jpg",
+        "condition": "direction 0"
+      },
+      "current": {
+        "identical": {
+          "member": "everett_lobby20/dir_0_mip2.jpg",
+          "condition": "direction 0"
+        },
+        "near": {
+          "member": "everett_lobby20/dir_1_mip2.jpg",
+          "condition": "direction 1"
+        },
+        "mild": {
+          "member": "everett_lobby20/dir_14_mip2.jpg",
+          "condition": "direction 14"
+        },
+        "strong": {
+          "member": "everett_lobby20/dir_24_mip2.jpg",
+          "condition": "direction 24"
+        }
+      }
+    }
+  ]
+}
